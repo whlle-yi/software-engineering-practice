@@ -1,0 +1,36 @@
+# ---- 操作系统与编辑器 ----
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.swp
+*~
+
+# ---- Office 临时锁文件 ----
+~$*
+*.tmp
+.~lock.*
+
+# ---- 工具产物（不纳入版本库）----
+.workbuddy/memory/
+.workbuddy/tmp/
+.workbuddy/*.log
+
+# ---- 依赖与构建产物（第 12 周起会出现）----
+node_modules/
+__pycache__/
+*.pyc
+dist/
+build/
+.venv/
+venv/
+*.egg-info/
+
+# ---- 本地环境配置（可能含密钥）----
+.env
+.env.*
+!.env.example
+
+# ---- 压缩包（提交前由 submission/ 统一生成）----
+*.zip
+*.7z
+*.rar

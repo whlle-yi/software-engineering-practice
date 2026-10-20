@@ -1,0 +1,34 @@
+# 统一换行符，避免跨平台 diff 噪声
+* text=auto eol=lf
+
+# 文本类显式声明
+*.md      text
+*.txt     text
+*.json    text
+*.yml     text
+*.yaml    text
+*.sql     text
+*.py      text
+*.js      text
+*.ts      text
+*.java    text
+*.html    text
+*.css     text
+*.drawio  text
+*.puml    text
+
+# 二进制文档：不做行尾转换，不参与文本 diff
+*.docx    binary
+*.doc     binary
+*.xlsx    binary
+*.xls     binary
+*.pptx    binary
+*.ppt     binary
+*.pdf     binary
+*.vsdx    binary
+*.mpp     binary
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.svg     text
