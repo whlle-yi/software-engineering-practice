@@ -32,7 +32,7 @@
 第N次/1-可行性研究/可行性研究报告-v1.0.docx   ← 从 1 号模板复制而来，随便改
 ```
 
-已经存在于 `第一次/.workbuddy/tools/可行性报告模板.docx` 的，是从 1 号模板转换来的**副本**，
+已经存在于 `.workbuddy/tools/可行性报告模板.docx` 的，是从 1 号模板转换来的**副本**，
 供 `md2docx.py` 当基底用。它也是副本，**改它不等于可以改原件**；若原件更新，重新生成这个副本。
 
 ---
@@ -61,8 +61,10 @@
 
 ```bash
 # 生成提交件（必须用系统 python，托管 python 没有 python-docx）
+# .workbuddy/ 在课程根，脚本可在任意工作目录下运行（模板副本按脚本位置解析）
 "$HOME/AppData/Local/Microsoft/WindowsApps/python.exe" \
-  第一次/.workbuddy/tools/md2docx.py 报告.md 报告.docx
+  .workbuddy/tools/md2docx.py 第一次/1-可行性研究/可行性研究报告-v1.0.md \
+                              第一次/1-可行性研究/可行性研究报告-v1.0.docx
 ```
 
 ---
