@@ -641,18 +641,32 @@ def add_table(doc, body, sectPr, payload):
             continue
     table.alignment = 1  # center
 
-    # 细边框
+    # 标准三线表：顶线/底线 1.5pt(sz12)，栏目线 0.75pt(sz6) 在表头行，无竖线与内横线
     tbl = table._tbl
     tblPr = tbl.tblPr
     borders = OxmlElement("w:tblBorders")
-    for edge in ("top", "left", "bottom", "right", "insideH", "insideV"):
+    for edge, val, sz in (("top", "single", 12), ("left", "none", 0), ("bottom", "single", 12),
+                          ("right", "none", 0), ("insideH", "none", 0), ("insideV", "none", 0)):
         e = OxmlElement(f"w:{edge}")
-        e.set(qn("w:val"), "single")
-        e.set(qn("w:sz"), "4")
-        e.set(qn("w:space"), "0")
-        e.set(qn("w:color"), "000000")
+        e.set(qn("w:val"), val)
+        if val != "none":
+            e.set(qn("w:sz"), str(sz))
+            e.set(qn("w:space"), "0")
+            e.set(qn("w:color"), "000000")
         borders.append(e)
     tblPr.append(borders)
+    # 表头行：栏目线 + 跨页自动重复（标准续页格式）
+    trPr = table.rows[0]._tr.get_or_add_trPr()
+    th = OxmlElement("w:tblHeader"); th.set(qn("w:val"), "true")
+    trPr.append(th)
+    for cell in table.rows[0].cells:
+        tcPr = cell._tc.get_or_add_tcPr()
+        tb = OxmlElement("w:tcBorders")
+        e = OxmlElement("w:bottom")
+        e.set(qn("w:val"), "single"); e.set(qn("w:sz"), "6")
+        e.set(qn("w:space"), "0"); e.set(qn("w:color"), "000000")
+        tb.append(e)
+        tcPr.append(tb)
 
     for ri, row in enumerate(rows):
         for ci in range(ncol):
@@ -662,7 +676,11 @@ def add_table(doc, body, sectPr, payload):
             para.alignment = WD_ALIGN_PARAGRAPH.CENTER
             raw = row[ci] if ci < len(row) else ""
             for text, bold, _italic in parse_inline(raw):
-                run = para.add_run(text)
+                tcPr2 = cell._tc.get_or_add_tcPr()
+            if tcPr2.find(qn("w:vAlign")) is None:
+                va = OxmlElement("w:vAlign"); va.set(qn("w:val"), "center")
+                tcPr2.append(va)
+            run = para.add_run(text)
                 run.font.size = Pt(10.5)
                 run.font.bold = True if (bold or ri == 0) else None
                 rPr = run._element.get_or_add_rPr()
