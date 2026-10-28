@@ -65,13 +65,71 @@ def pad_to(value: str, original_gap: str) -> str:
     return " " * lead + value + " " * (spare - lead)
 
 
-def segments_of(text: str, labels, values):
-    """把含填空区的一行拆成 [(是否划线, 文本)]。
+def _orig_ul_segments(p):
+    """把段落原始 run 合并为 [(是否下划线, 文本)] 连续段。"""
+    segs = []
+    for r in p.findall(qn("w:r")):
+        rPr = r.find(qn("w:rPr"))
+        u = rPr.find(qn("w:u")) if rPr is not None else None
+        ul = u is not None and u.get(qn("w:val")) not in (None, "none")
+        t = "".join(tt.text or "" for tt in r.findall(qn("w:t")))
+        if not t:
+            continue
+        if segs and segs[-1][0] == ul:
+            segs[-1][1] += t
+        else:
+            segs.append([ul, t])
+    return segs
 
-    填空区（含空白的间隙）→ 划线；标签 → 不划线。
+
+def _fill_gap(orig, gs, ge, val):
+    """填一个间隙 [gs,ge)：值只填进**原本就带下划线**的子段（居中），
+    非下划线子段（标签间距、下划线前的缓冲空格）原样保留。
+    这保证下划线起始/结束位置与模板逐字符一致；无值时间隙原样保留。"""
+    subs = []  # [(ul, piece)]
+    pos = 0
+    for ul, t in orig:
+        a, b = pos, pos + len(t)
+        pos = b
+        if b <= gs or a >= ge:
+            continue
+        piece = t[max(gs - a, 0): max(ge - a, 0)]
+        if subs and subs[-1][0] == ul:
+            subs[-1][1] += piece
+        else:
+            subs.append([ul, piece])
+
+    ul_text = "".join(t for ul, t in subs if ul)
+    # 注意：填空区本身就是一串空格，不能以 strip() 判断，只需存在下划线子段
+    filled = pad_to(val, ul_text) if (val.strip() and ul_text) else None
+
+    out = []
+    done_ul = False
+    for ul, t in subs:
+        if not ul:
+            out.append((False, t))
+        elif filled is not None:
+            if not done_ul:
+                out.append((True, filled))
+                done_ul = True
+            # 有值时其余 ul 子段已并入 filled，跳过
+        else:
+            out.append((True, t))
+    return out
+
+
+def segments_of(p_el, labels, values):
+    """按模板原始下划线结构定位填空区并填值，返回 [(是否划线, 文本)]。
+
     values 按间隙位置索引：n 个标签对应 n+1 个间隙（行首、标签之间…、行尾）。
-    （与 v1 原实现一致，勿改约定）
+    与 v1 的差异：v1 把每个间隙整段压成一个下划线 run，会抹掉模板里
+    "下划线前的非下划线缓冲空格"、并给"班    级"这类标签间距误加下划线；
+    v2 按原始 run 的下划线结构分子段填值，起始位置与模板逐字符一致。
+    （签名与 v1 不同：第一个参数是段落 lxml 元素，不是文本）
     """
+    orig = _orig_ul_segments(p_el)
+    text = "".join(t for _, t in orig)
+
     spans = []
     cursor = 0
     for lab in labels:
@@ -81,25 +139,14 @@ def segments_of(text: str, labels, values):
         spans.append((i, i + len(lab)))
         cursor = i + len(lab)
 
-    gaps = []
-    prev_end = 0
-    for s, e in spans:
-        gaps.append(text[prev_end:s])
-        prev_end = e
-    gaps.append(text[prev_end:])
-
     segs = []
-    n = len(spans)
+    pos = 0
     for k, (s, e) in enumerate(spans):
-        # 中间填空区即使没填值也要保留划线（那是待填空位）；
-        # 行首缩进与行尾空白只在有值时才划线，避免出现悬空的下划线。
-        mid = 0 < k < n
-        underline = True if mid else bool(values[k].strip())
-        segs.append((underline, pad_to(values[k], gaps[k])))
+        segs.extend(_fill_gap(orig, pos, s, values[k] if k < len(values) else ""))
         segs.append((False, text[s:e]))
-    last = n
-    underline = bool(values[last].strip())
-    segs.append((underline, pad_to(values[last], gaps[-1])))
+        pos = e
+    segs.extend(_fill_gap(orig, pos, len(text),
+                          values[len(spans)] if len(values) > len(spans) else ""))
     return segs
 
 
@@ -386,7 +433,7 @@ def build(template: str, md_path: str, out_path: str):
             continue  # 全空则保持模板原样
         p = paras[idx]
         try:
-            _rewrite_runs(p._p, segments_of(p.text, labels, vals))
+            _rewrite_runs(p._p, segments_of(p._p, labels, vals))
         except ValueError as e:
             print(f"  ! 封面第 {idx} 行填失败：{e}")
 
@@ -398,7 +445,7 @@ def build(template: str, md_path: str, out_path: str):
         if "班" not in cls:
             cls += "班"
         p = paras[16]
-        _rewrite_runs(p._p, segments_of(p.text, ["班", "级"], ["", "", cls]))
+        _rewrite_runs(p._p, segments_of(p._p, ["班", "级"], ["", "", cls]))
 
     # 开课学期：'开课学期  至  学年第  学期'
     term_raw = cover.get("开课学期", "")
@@ -408,7 +455,7 @@ def build(template: str, md_path: str, out_path: str):
             p = paras[19]
             _rewrite_runs(
                 p._p,
-                segments_of(p.text, ["开课学期", "至", "学年第", "学期"],
+                segments_of(p._p, ["开课学期", "至", "学年第", "学期"],
                             ["", m.group(1), m.group(2), m.group(3), ""]),
             )
 
@@ -420,7 +467,7 @@ def build(template: str, md_path: str, out_path: str):
             p = paras[20]
             _rewrite_runs(
                 p._p,
-                segments_of(p.text, ["完成时间", "年", "月", "日"],
+                segments_of(p._p, ["完成时间", "年", "月", "日"],
                             ["  ", m.group(1), m.group(2), m.group(3), ""]),
             )
 
