@@ -568,6 +568,8 @@ def _caption_para(text):
     p.append(pPr)
     r = OxmlElement("w:r")
     rPr = OxmlElement("w:rPr")
+    rPr.append(OxmlElement("w:b"))   # 题注加粗（图注/表注，用户 2026-10-29 要求）
+    rPr.append(OxmlElement("w:bCs"))
     sz = OxmlElement("w:sz")
     sz.set(qn("w:val"), "21")  # 10.5pt 五号
     rPr.append(sz)
