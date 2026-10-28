@@ -753,7 +753,7 @@ def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     # 默认模板：课程根 .workbuddy/tools/可行性报告模板.docx（按脚本位置解析，任意 CWD 可跑）
     here = os.path.dirname(os.path.abspath(__file__))
-    template = os.path.normpath(os.path.join(here, "..", ".workbuddy", "tools", "可行性报告模板.docx"))
+    template = os.path.normpath(os.path.join(here, "..", "..", ".workbuddy", "tools", "可行性报告模板.docx"))
     if "--template" in sys.argv:
         template = sys.argv[sys.argv.index("--template") + 1]
         args = [a for a in args if a != template]
