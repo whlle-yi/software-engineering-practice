@@ -49,7 +49,11 @@ def width_units(s: str) -> int:
 
 
 def pad_to(value: str, original_gap: str) -> str:
-    """把 value 填进原文的空白区，尽量保持该区宽度不变。"""
+    """把 value 居中填进原文的空白区（用户要求：填入内容在下划线内居中）。
+
+    保持总显示宽度不变：左右各补一半空格（余数归右侧）；
+    value 比间隙宽时原样返回——value 自带下划线格式，下划线随之加长。
+    """
     if not value:
         return original_gap
     target = width_units(original_gap)
@@ -57,7 +61,7 @@ def pad_to(value: str, original_gap: str) -> str:
     if gap_now >= target:
         return value
     spare = target - gap_now
-    lead = 1 if spare >= 2 else 0
+    lead = spare // 2
     return " " * lead + value + " " * (spare - lead)
 
 
@@ -386,10 +390,12 @@ def build(template: str, md_path: str, out_path: str):
         except ValueError as e:
             print(f"  ! 封面第 {idx} 行填失败：{e}")
 
-    # 班级：模板里是 '班    级      xxx班'，把含 xxx 的填空区整段换掉
+    # 班级：模板里是 '班    级      xxx班'，把含 xxx 的填空区整段换掉。
+    # 只在值里完全不含"班"字时才自动补"班"（如"软件2101"→"软件2101班"）；
+    # "计算机拔尖班241"这类班级名本身含"班"，不能再补，否则成"…241班"。
     cls = cover.get("班级", "")
     if cls:
-        if not cls.endswith("班"):
+        if "班" not in cls:
             cls += "班"
         p = paras[16]
         _rewrite_runs(p._p, segments_of(p.text, ["班", "级"], ["", "", cls]))
