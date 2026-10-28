@@ -18,7 +18,7 @@ Desktop.ini
 .~lock.*
 
 # ---- 工具产物（不纳入版本库）----
-# 含 memory/、tmp/、tools/（脚本与模板副本），仓库只放交付成果
+# .workbuddy/：前代助手遗留（校验脚本、模板副本）
 .workbuddy/
 .workbuddy/*.log
 
