@@ -542,8 +542,12 @@ def build(template: str, md_path: str, out_path: str):
         elif kind == "p":
             add(clone_para(body_proto, body_r, payload))
         elif kind == "li":
+            # 列表项用圆圈号 ①②③…，避免与正文手写的（1）（2）方面标签撞号
+            # （2026-10-29 用户指出 2.1 出现两套（N）编号）
             li_counter[0] += 1
-            add(clone_para(body_proto, body_r, f"（{li_counter[0]}）{payload}"))
+            nums = "①②③④⑤⑥⑦⑧⑨⑩⑪⑫"
+            k = min(li_counter[0], 12)
+            add(clone_para(body_proto, body_r, f"{nums[k - 1]}{payload}"))
         elif kind == "table":
             add_table(doc, body, sectPr, payload)
         elif kind == "img":
