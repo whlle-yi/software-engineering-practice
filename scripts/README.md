@@ -27,11 +27,16 @@
 
 ```bash
 # 生成提交件（必须用系统 python，托管 python 没有 python-docx）
-# 模板副本默认取 .workbuddy/tools/可行性报告模板.docx，可在任意工作目录下运行
+# 模板基底：只读区与原件并列的同名 .docx 工作副本（本脚本默认指向 1 号），任意工作目录可跑
 "$HOME/AppData/Local/Microsoft/WindowsApps/python.exe" \
   scripts/md2docx_feasibility.py 1-可行性研究报告工作区/可行性研究报告-v1.0.md \
                                  1-可行性研究报告工作区/可行性研究报告-v1.0.docx
 ```
+
+**模板工作副本的来历与维护**：1~5 号老师模板是 .doc 格式，生成链（python-docx）读不了，故各夹内备一份
+**与原件同名、经 Word COM 转换**的 .docx 工作副本（`ReadOnly=True` 打开原件另存为 docx，原件不动）。
+**必须用 Word 转换**——LibreOffice 转换有度量漂移（实测页数 23→26、表格样式名丢失）。
+原件更新时重新转换覆盖；克隆仓库后自备（`模板及总体要求\` 不入库）。
 
 md 书写契约见 `md2docx_feasibility.py` 头部 docstring，**必须遵守**（必须有 `## 封面` 节、封面未知字段留空、行内只用 `**粗**`/`*斜*`、图片独立成行等）。
 

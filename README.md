@@ -45,7 +45,7 @@
 | 项目计划 | `1-可行性研究报告工作区/项目计划-v0.1.xlsx` | 28 条 WBS + 16 周甘特图 + 8 个里程碑 |
 | 小组分工表 | `1-可行性研究报告工作区/小组分工表-v0.1.md` | 5 角色 + 阶段责任矩阵（姓名学号待填） |
 | 模拟评审表 | `1-可行性研究报告工作区/模拟评审表-v0.1.md` | 自查清单 + 互评打分，第 5–6 周用 |
-| md → docx 生成链（v2） | `scripts/md2docx_feasibility.py` | 绑定 1 号模板；脚本命名规则见 `scripts/README.md`，其他报告脚本到各自阶段新增 |
+| md → docx 生成链（v2） | `scripts/md2docx_feasibility.py` | 绑定 1 号模板；基底=只读区同名 docx 工作副本（Word 转换）；命名规则见 `scripts/README.md` |
 
 ---
 
@@ -56,7 +56,7 @@
 │
 ├── AGENTS.md                       ★ 工作规则：只读区、可写区、文档铁律
 ├── README.md                      本文件：进度总览
-├── .workbuddy\                    前代助手遗留：模板副本 + 校验脚本（不入库，只读）
+├── .workbuddy\                    前代助手遗留：校验脚本等工具（不入库，只读）
 │
 ├── .zcode\                        项目记忆正本（memory/，不入库）
 │
@@ -156,4 +156,4 @@
 
 ## 七、长期记忆
 
-**项目记忆正本在工作区 `.zcode/memory/`**（本目录内，gitignore 不入库），每完成一项进度都要记入其中；ZCode 另有一份自动加载的同步副本（会话开始时若落后，从正本覆盖同步）。`.workbuddy/` 是前代助手（workbuddy）的遗留工具（2026-10-28 清理：遗留记忆已迁入 `.zcode/memory/`，被取代的 v1 生成器与样例已删），只读保留、不再写入；其校验脚本 `verify_output.py` 与模板副本照常使用，生成器正典在 `scripts/md2docx_feasibility.py`。
+**项目记忆正本在工作区 `.zcode/memory/`**（本目录内，gitignore 不入库），每完成一项进度都要记入其中；ZCode 另有一份自动加载的同步副本（会话开始时若落后，从正本覆盖同步）。`.workbuddy/` 是前代助手（workbuddy）的遗留工具（2026-10-28 清理：遗留记忆已迁入 `.zcode/memory/`，被取代的 v1 生成器与样例已删），只读保留、不再写入；其校验脚本 `verify_output.py` 照常使用。生成器正典 `scripts/md2docx_feasibility.py` 的模板基底是 `模板及总体要求\` 各夹内与原件同名的 docx 工作副本（Word 转换，勿用 LibreOffice——有度量漂移）。

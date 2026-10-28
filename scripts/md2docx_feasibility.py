@@ -616,7 +616,14 @@ def add_table(doc, body, sectPr, payload):
 
     ncol = max(len(r) for r in rows)
     table = doc.add_table(rows=len(rows), cols=ncol)
-    table.style = doc.styles["Normal Table"]
+    # 表格基样式名因转换器而异（Word 转 "Normal Table"，LibreOffice 转可能是
+    # "Table Normal"/"普通表格"），逐个试，找不到就不设（add_table 自带默认基样式）
+    for name in ("Normal Table", "Table Normal", "普通表格"):
+        try:
+            table.style = doc.styles[name]
+            break
+        except KeyError:
+            continue
     table.alignment = 1  # center
 
     # 细边框
@@ -751,9 +758,9 @@ def refresh_page_numbers(path):
 
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    # 默认模板：课程根 .workbuddy/tools/可行性报告模板.docx（按脚本位置解析，任意 CWD 可跑）
+    # 默认模板：只读区与原件并列的同名 docx 工作副本（由原件 .doc 转换而来）
     here = os.path.dirname(os.path.abspath(__file__))
-    template = os.path.normpath(os.path.join(here, "..", ".workbuddy", "tools", "可行性报告模板.docx"))
+    template = os.path.normpath(os.path.join(here, "..", "模板及总体要求", "1-可行性研究报告模板", "1 可行性研究报告模板及要求.docx"))
     if "--template" in sys.argv:
         template = sys.argv[sys.argv.index("--template") + 1]
         args = [a for a in args if a != template]
