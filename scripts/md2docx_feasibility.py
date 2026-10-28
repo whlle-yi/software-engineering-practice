@@ -471,6 +471,19 @@ def build(template: str, md_path: str, out_path: str):
                             ["  ", m.group(1), m.group(2), m.group(3), ""]),
             )
 
+    # ---------- 1.5 封面缩进去"字符数"化 ----------
+    # 封面行的 w:ind 同时带 firstLineChars/leftChars（字符相对值）与绝对值；
+    # OOXML 中字符值优先，Word 更新域保存时会按"段落标记字号"重算绝对值
+    # （实测：700 字符 × 14pt 把"完成时间"行从 73.5pt 推到 98pt，整行右移）。
+    # 只读区转换件的绝对值与 .doc 原件一致，故剥掉字符值、保留绝对值，Word 无从重算。
+    for p in paras[11:21]:
+        pPr = p._p.find(qn("w:pPr"))
+        ind = pPr.find(qn("w:ind")) if pPr is not None else None
+        if ind is not None:
+            for attr in ("w:firstLineChars", "w:leftChars", "w:hangingChars"):
+                if ind.get(qn(attr)) is not None:
+                    del ind.attrib[qn(attr)]
+
     # ---------- 2. 取原型段落（删除前先留样本） ----------
     def find_proto(pred):
         for p in doc.paragraphs:
