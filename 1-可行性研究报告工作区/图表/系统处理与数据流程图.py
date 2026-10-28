@@ -33,15 +33,18 @@ plt.rcParams.update({
 
 FIG_W, FIG_H = 6.1, 5.6
 fig, ax = plt.subplots(figsize=(FIG_W, FIG_H))
-ax.set_xlim(0, 100); ax.set_ylim(1, 100)
+ax.set_xlim(0, 100); ax.set_ylim(-4, 100)
 ax.axis("off")
 
 ARROW = dict(arrowstyle="-|>", color=C_FLOW, lw=1.1, shrinkA=0, shrinkB=0)
 
 def capsule(cx, cy, w, h, text):
-    ax.add_patch(FancyBboxPatch((cx - w/2, cy - h/2), w, h,
-                                boxstyle=f"round,pad=0.3,rounding_size={h/2 - 0.3}",
-                                fc=PRIMARY, ec=PRIMARY, lw=1.0, zorder=3))
+    # 胶囊 = 矩形 + 两端圆形端盖（基本图元，绕开 Word SVG 渲染器对大圆弧路径的缺陷）
+    from matplotlib.patches import Circle, Rectangle
+    cr = h / 2
+    ax.add_patch(Rectangle((cx - w/2 + cr, cy - cr), w - 2*cr, h, fc=PRIMARY, ec=PRIMARY, lw=1.0, zorder=3))
+    ax.add_patch(Circle((cx - w/2 + cr, cy), cr, fc=PRIMARY, ec=PRIMARY, lw=1.0, zorder=3))
+    ax.add_patch(Circle((cx + w/2 - cr, cy), cr, fc=PRIMARY, ec=PRIMARY, lw=1.0, zorder=3))
     ax.text(cx, cy, text, ha="center", va="center", fontsize=9.5, color="white", zorder=4)
 
 def box(cx, cy, w, h, text, key=False, fs=9.5):
@@ -108,7 +111,7 @@ arrow((X, 26), (X, 21)); branch(X + 2.5, 23.5, "是")
 arrow((X, 15), (X, 10.5))
 loop([(9, 64), (5, 64), (5, 75), (12, 75)], "否，调整后重排", 4.2, 69.5)
 loop([(9, 29), (5, 29), (5, 40), (14, 40)], "否，退回修改", 3.6, 34.5)
-ax.text(X, 4, "(a) 处理流程", ha="center", va="center", fontsize=10, color=C_TEXT)
+ax.text(X, 1.6, "(a) 处理流程", ha="center", va="center", fontsize=10, color=C_TEXT)
 
 # ================ 面板 (b) 数据流程（DFD-0，x 46–98） ================
 ext(58, 90, 15, 8, "教务主系统")                    # x50.5–65.5 y86–94
@@ -131,7 +134,7 @@ arrow((90, 25), (90, 18)); label(80.5, 21.5, "课表查询")
 arrow((72, 25), (72, 17)); label(66.5, 21, "更新课表")
 arrow((85.5, 12), (82, 12)); label(88.5, 8.5, "调课申请")
 arrow((62, 12), (53.5, 12)); label(57, 8.5, "变更通知")
-ax.text(70, 3.2, "(b) 数据流程", ha="center", va="center", fontsize=10, color=C_TEXT)
+ax.text(70, 1.2, "(b) 数据流程", ha="center", va="center", fontsize=10, color=C_TEXT)
 
 fig.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
 stem = "处理与数据流_business_20261029"
