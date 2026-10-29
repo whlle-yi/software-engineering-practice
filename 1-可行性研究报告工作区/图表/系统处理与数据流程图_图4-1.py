@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""图 2-1 系统基本处理流程图与数据流程图，双面板：(a) 处理流程 (b) 数据流程。
+"""图 4-1 系统处理流程图与数据流程图，双面板：(a) 处理流程 (b) 数据流程。
 
 (a) 算法流程图（TD，期初排课 → 学期调课全周期）：胶囊起止、矩形处理、
     菱形判断（是/否）、虚线回流绕左外侧。
@@ -137,7 +137,7 @@ arrow((62, 12), (51.5, 12)); label(56.75, 9.6, "变更通知")
 ax.text(70, 1.2, "(b) 数据流程", ha="center", va="center", fontsize=10, color=C_TEXT)
 
 fig.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
-stem = "处理与数据流_business_20261029"
+stem = "处理与数据流_business_20261029"  # 输出 图4-1_<stem>.*
 fig.savefig(HERE / f"图2-1_{stem}.svg")
 fig.savefig(HERE / f"图2-1_{stem}_目检.png", dpi=200)
 plt.close(fig)
