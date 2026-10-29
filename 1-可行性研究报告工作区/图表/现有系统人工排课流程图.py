@@ -29,7 +29,7 @@ plt.rcParams.update({
 
 FIG_W, FIG_H = 6.1, 5.6
 fig, ax = plt.subplots(figsize=(FIG_W, FIG_H))
-ax.set_xlim(0, 100); ax.set_ylim(0, 100)
+ax.set_xlim(0, 100); ax.set_ylim(-3, 100)
 ax.axis("off")
 
 ARROW = dict(arrowstyle="-|>", color=C_FLOW, lw=1.1, shrinkA=0, shrinkB=0)
@@ -94,7 +94,7 @@ diamond(X, 44, 22, 9, "发现冲突？")
 box(X, 32.5, 24, 6, "群消息下发课表截图")
 box(X, 23, 16, 6, "教师提出调课")
 box(X, 13.5, 20, 6, "手工改表并通知", key=True)
-capsule(X, 5, 12, 5, "学期结束")
+capsule(X, 7, 12, 5, "学期结束")
 
 arrow((X, 90.5), (X, 87))
 arrow((X, 81), (X, 77.5))
@@ -104,7 +104,7 @@ arrow((X, 52.5), (X, 48.5))
 arrow((X, 39.5), (X, 35.5)); branch(X + 2.5, 37.5, "否")
 arrow((X, 29.5), (X, 26))
 arrow((X, 20), (X, 16.5))
-arrow((X, 10.5), (X, 7.5))
+arrow((X, 10.5), (X, 9.3))
 
 loop([(11, 44), (8, 44), (8, 65), (13, 65)], "否", 6.5, 54.5)
 branch(10.5, 66.8, "是")
@@ -118,7 +118,7 @@ dlabel(39.5, 37.8, "定稿课表")
 dlabel(39.5, 27.8, "课表截图" + NL + "群消息")
 dlabel(39.5, 8.8, "逐个通知")
 
-ax.text(X, 1.6, "(a) 处理流程", ha="center", va="center", fontsize=10, color=C_TEXT)
+ax.text(X, 1.2, "(a) 处理流程", ha="center", va="center", fontsize=10, color=C_TEXT)
 
 # ============ 面板 (b) 数据流程（人工系统 DFD-0，x 54–98） ============
 ext(75, 90, 16, 8, "教务处")
@@ -133,7 +133,7 @@ arrow((75, 71), (75, 63)); dlabel(81, 67, "四张基础表")
 arrow((75, 53), (75, 47)); dlabel(81, 50, "课表截图、群消息")
 arrow((75, 38), (75, 31)); dlabel(81, 34.5, "调课需求" + NL + "（口头/群消息）")
 arrow((75, 21), (75, 14)); dlabel(81, 17.5, "变更通知")
-ax.text(75, 1.8, "(b) 数据流程", ha="center", va="center", fontsize=10, color=C_TEXT)
+ax.text(75, 1.2, "(b) 数据流程", ha="center", va="center", fontsize=10, color=C_TEXT)
 
 fig.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
 stem = "现有系统人工排课_business_20261029"
