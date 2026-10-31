@@ -15,7 +15,7 @@
 
 ## 三、文档铁律
 
-1. **docx 单文件直改直登记**：docx 是唯一工作文件（不产出、不维护 md），改动直接在 docx 上进行，每处修改登记入工作区 README「手工修改登记」；`scripts\` 生成链备用，脚本命名 `<功能>_<交付物英文名>.py`（feasibility/srs/hld/lld/test）。
+1. **docx 单文件直改直登记**：docx 是唯一工作文件（不产出、不维护 md），改动直接在 docx 上进行，每处修改以 git 提交记录（提交信息写明改了什么、为什么）；`scripts\` 生成链备用，脚本命名 `<功能>_<交付物英文名>.py`（feasibility/srs/hld/lld/test）。
 2. **格式从模板来**：模板样式、字号、行距、页边距、分节页码一律不改，内容套模板已有样式；**模板指导语（"说明……"）必删**；二级标题黑体、三级宋体是模板原样，不要"统一"。
 3. **交付件的 COM 操作（更新目录、导 PDF 等）一律 WPS**（`KWPS.Application`，DispatchEx 独立实例 + 逐调用退避重试），**禁用 Word.Application**；WPS 保存链劣化内嵌图形——插图用 600dpi PNG，终稿从 docx 直接导 PDF。
 
