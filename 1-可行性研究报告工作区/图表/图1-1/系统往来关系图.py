@@ -91,6 +91,6 @@ label(62, 29, "时间冲突反馈")
 fig.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
 stem = "往来关系_business_20261029"
 fig.savefig(HERE / f"图1-1_{stem}.svg")
-fig.savefig(HERE / f"图1-1_{stem}_目检.png", dpi=200)
+fig.savefig(HERE / f"图1-1_{stem}_目检.png", dpi=600)
 plt.close(fig)
 print("SVG/PNG 已输出")

@@ -139,6 +139,6 @@ ax.text(70, 1.2, "(b) 数据流程", ha="center", va="center", fontsize=10, colo
 fig.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
 stem = "处理与数据流_business_20261029"  # 输出 图4-1_<stem>.*
 fig.savefig(HERE / f"图2-1_{stem}.svg")
-fig.savefig(HERE / f"图2-1_{stem}_目检.png", dpi=200)
+fig.savefig(HERE / f"图4-1_{stem}_目检.png", dpi=600)
 plt.close(fig)
 print("SVG/PNG 已输出")
