@@ -69,18 +69,18 @@ def dlabel(x, y, text):
 # ============ 面板 (a) 处理流程（简略，车道 x=24，5 个主步骤） ============
 X = 24
 capsule(X, 92, 11, 5, "开始")
-box(X, 82, 26, 6, "导入基础数据与排课约束")
-box(X, 72, 22, 6, "自动排课与冲突检测", key=True)
-box(X, 62, 16, 6, "发布课表")
-box(X, 52, 26, 6, "调课审核与重排并通知", key=True)
-capsule(X, 42, 11, 5, "结束")
+box(X, 78, 26, 6, "导入基础数据与排课约束")
+box(X, 64, 22, 6, "自动排课与冲突检测", key=True)
+box(X, 50, 16, 6, "发布课表")
+box(X, 36, 26, 6, "调课审核与重排并通知", key=True)
+capsule(X, 22, 11, 5, "结束")
 
-arrow((X, 89.5), (X, 85))
-arrow((X, 79), (X, 75))
-arrow((X, 69), (X, 65))
-arrow((X, 59), (X, 55))
-arrow((X, 49), (X, 44.5))
-ax.text(X, 36, "(a) 处理流程", ha="center", va="center", fontsize=10, color=C_TEXT)
+arrow((X, 89.5), (X, 81))
+arrow((X, 75), (X, 67))
+arrow((X, 61), (X, 53))
+arrow((X, 47), (X, 39))
+arrow((X, 33), (X, 24.5))
+ax.text(X, 16, "(a) 处理流程", ha="center", va="center", fontsize=10, color=C_TEXT)
 
 # ============ 面板 (b) 数据流程（简略 DFD-0，纵链 x=75） ============
 ext(75, 92, 14, 8, "教务主系统")
@@ -94,10 +94,10 @@ arrow((75, 88), (75, 79)); dlabel(81, 83.5, "教学任务")
 arrow((75, 73), (75, 65)); dlabel(81, 69, "四张基础表")
 arrow((75, 55), (75, 47))
 arrow((75, 41), (75, 36))
-arrow((75, 36), (60, 36)); arrow((60, 36), (60, 30)); dlabel(64.5, 37.5, "课表查询")
-arrow((75, 36), (90, 36)); arrow((90, 36), (90, 30)); dlabel(85, 37.5, "变更通知")
+arrow((75, 36), (60, 36)); arrow((60, 36), (60, 30)); dlabel(56, 37.5, "课表查询")
+arrow((75, 36), (90, 36)); arrow((90, 36), (90, 30)); dlabel(86, 37.5, "变更通知")
 arrow((54, 26), (65, 26))
-ax.text(75, 3.2, "(b) 数据流程", ha="center", va="center", fontsize=10, color=C_TEXT)
+ax.text(75, 16, "(b) 数据流程", ha="center", va="center", fontsize=10, color=C_TEXT)
 
 fig.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
 stem = "基本处理与数据流_business_20261029"
