@@ -29,7 +29,7 @@ plt.rcParams.update({
 
 FIG_W, FIG_H = 6.1, 5.6
 fig, ax = plt.subplots(figsize=(FIG_W, FIG_H))
-ax.set_xlim(0, 100); ax.set_ylim(0, 100)
+ax.set_xlim(1.5, 98.5); ax.set_ylim(12.5, 99)
 ax.axis("off")
 
 ARROW = dict(arrowstyle="-|>", color=C_FLOW, lw=1.1, shrinkA=0, shrinkB=0)
