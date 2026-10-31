@@ -96,7 +96,7 @@ arrow((75, 55), (75, 49))
 arrow((75, 41), (75, 36))
 arrow((75, 36), (60, 36)); arrow((60, 36), (60, 30)); dlabel(64.5, 37.5, "课表查询")
 arrow((75, 36), (90, 36)); arrow((90, 36), (90, 30)); dlabel(85, 37.5, "变更通知")
-arrow((54, 26), (65, 26)); dlabel(59.5, 28.5, "调课/代课申请")
+arrow((54, 26), (65, 26))
 ax.text(75, 3.2, "(b) 数据流程", ha="center", va="center", fontsize=10, color=C_TEXT)
 
 fig.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
