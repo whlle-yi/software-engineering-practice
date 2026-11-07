@@ -57,7 +57,7 @@ def label(x, y, text, ha="left"):
 # ---- 系统边界（虚线框）----
 ax.add_patch(Rectangle((4, 24), 92, 50, fill=False, ec=C_EXT, lw=1.1,
                        linestyle=(0, (4, 3)), zorder=1))
-ax.text(50, 70.5, "高校智能排课系统（B/S 架构）", ha="center", va="center",
+ax.text(50, 70.5, "高校排课系统（PiAgent 赋能，B/S 架构）", ha="center", va="center",
         fontsize=10.5, color=C_TEXT, zorder=4)
 
 # ---- 顶部外部系统 ----
