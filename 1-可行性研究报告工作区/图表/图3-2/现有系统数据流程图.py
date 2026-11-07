@@ -14,9 +14,9 @@ BLUE = "#1B3770"
 
 plt.rcParams.update({"font.family": ["Times New Roman", "SimHei"], "savefig.bbox": None})
 
-fig, ax = plt.subplots(figsize=(6.1, 5.0))
+fig, ax = plt.subplots(figsize=(6.1, 5.85))
 ax.set_xlim(1, 78.5)
-ax.set_ylim(5.5, 74.5)
+ax.set_ylim(0, 74)
 ax.axis("off")
 
 
@@ -53,27 +53,27 @@ def label(x, y, text, ha="center", rotation=0):
 ext(10, 65, 14, 8, "教务处")
 proc(38, 65, 8, "1", "人工整理\n与试排")
 ext(70, 65, 14, 8, "任课教师")
-store(38, 40, 26, "D1  教学秘书个人 Excel")
-proc(38, 15, 8, "2", "手工改表\n与通知")
-ext(14, 15, 14, 8, "学生")
+store(38, 34, 26, "D1  教学秘书个人 Excel")
+proc(38, 9, 8, "2", "手工改表\n与通知")
+ext(14, 9, 14, 8, "学生")
 
 # ---- 数据流（全部命名；圆周交点进圆）----
 arrow((17, 65), (30, 65))                      # 教务处→1
 label(23.5, 67, "教学任务")
 arrow((46, 65), (63, 65))                      # 1→任课教师
 label(54.5, 67, "课表截图、群消息")
-elbow_t = [(70, 61), (70, 15), (46, 15)]       # 任课教师→2
+elbow_t = [(70, 61), (70, 9), (46, 9)]       # 任课教师→2
 for i in range(len(elbow_t) - 2):
     ax.plot([elbow_t[i][0], elbow_t[i + 1][0]], [elbow_t[i][1], elbow_t[i + 1][1]],
             color=BLUE, lw=1.1, zorder=2)
 arrow(elbow_t[-2], elbow_t[-1])
 label(67.8, 38, "调课需求", rotation=90)
-arrow((30, 15), (21, 15))                      # 2→学生
+arrow((30, 9), (21, 9))                      # 2→学生
 label(25.5, 17, "变更通知")
-arrow((38, 57), (38, 43))                      # 1→D1
-label(34.5, 50, "试排课表与基础数据", rotation=90)
-arrow((38, 23), (38, 37))                      # 2→D1
-label(39.8, 30, "改后课表", rotation=90)
+arrow((38, 57), (38, 37))                      # 1→D1
+label(34.5, 50, "课表与基础数据", rotation=90)
+arrow((38, 17), (38, 31))                      # 2→D1
+label(39.8, 24, "改后课表", rotation=90)
 
 OUT = HERE / "现有系统数据流程图_20261107_目检.png"
 fig.savefig(OUT, dpi=600)
