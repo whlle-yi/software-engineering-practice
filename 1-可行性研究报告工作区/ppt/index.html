@@ -1256,58 +1256,53 @@
   </div>
 </section>
 
-<!-- ============ P8 所建议系统说明 ============ -->
+<!-- ============ P7 所建议系统说明 ============ -->
 <section class="slide dark" data-slide-id="proposal-overview">
   <div class="chrome">
-    <div>所建议系统 · To-Be</div>
+    <div>所建议系统 · TO-BE</div>
     <div>07 / 11</div>
   </div>
-  <div class="frame grid-2-7-5" style="padding-top:5vh">
-    <div style="display:flex; flex-direction:column; justify-content:space-between; gap:2.5vh">
-      <div>
-        <div class="kicker" data-anim>TO-BE · 方案构成</div>
-        <h2 class="h-xl" data-anim>五部分组成</h2>
-        <p class="lead" style="margin-top:1.6vh" data-anim>B/S 架构、三角色（教务管理员 / 教师 / 学生），核心由五部分组成：</p>
-        <ul data-anim style="margin-top:1.6vh; padding-left:1.2em; display:flex; flex-direction:column; gap:1.1vh; font-family:var(--sans-zh); font-size:max(16px,1.3vw); line-height:1.5">
-          <li><b>自动排课引擎</b>——贪心 + 回溯构造可行解，遗传 / 退火优化软约束</li>
-          <li><b>冲突检测</b>——时间 / 教室 / 教师三类硬约束全量扫描</li>
-          <li><b>调课在线闭环</b>——申请 → 审核 → 局部重排 → 通知</li>
-          <li><b>课表查询服务</b>——教师 / 班级 / 教室 / 个人四视图</li>
-          <li><b>智能体 PiAgent</b>——意图理解与操作编排</li>
-        </ul>
+  <div class="frame" style="padding-top:4vh">
+    <div class="kicker" data-anim>TO-BE · 方案构成</div>
+    <h2 class="h-xl" data-anim>五部分组成</h2>
+    <p class="lead" style="margin-bottom:1vh" data-anim>B/S 架构、三角色（教务管理员 / 教师 / 学生），核心由五部分组成：</p>
+
+    <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:2vw; margin-top:4vh; align-items:stretch">
+      <div data-anim style="border-top:2px solid var(--accent); padding-top:1.6vh; display:flex; flex-direction:column; gap:1.2vh">
+        <div style="font-family:var(--mono); font-size:max(12px,1vw); opacity:.55">01</div>
+        <div style="font-family:var(--serif-zh); font-weight:700; font-size:max(18px,1.5vw); line-height:1.3">自动排课<br>引擎</div>
+        <div style="font-family:var(--sans-zh); font-size:max(13px,1vw); line-height:1.55; opacity:.8">贪心 + 回溯构造可行解，遗传 / 退火优化软约束</div>
       </div>
-      <div class="callout" data-anim>
-        "PiAgent 只做编排、不做求解——<br>写操作经权限校验与审计留痕。"
-        <div class="callout-src">— 架构职责红线</div>
+      <div data-anim style="border-top:2px solid var(--accent); padding-top:1.6vh; display:flex; flex-direction:column; gap:1.2vh">
+        <div style="font-family:var(--mono); font-size:max(12px,1vw); opacity:.55">02</div>
+        <div style="font-family:var(--serif-zh); font-weight:700; font-size:max(18px,1.5vw); line-height:1.3">冲突检测</div>
+        <div style="font-family:var(--sans-zh); font-size:max(13px,1vw); line-height:1.55; opacity:.8">时间 / 教室 / 教师三类硬约束全量扫描</div>
+      </div>
+      <div data-anim style="border-top:2px solid var(--accent); padding-top:1.6vh; display:flex; flex-direction:column; gap:1.2vh">
+        <div style="font-family:var(--mono); font-size:max(12px,1vw); opacity:.55">03</div>
+        <div style="font-family:var(--serif-zh); font-weight:700; font-size:max(18px,1.5vw); line-height:1.3">调课在线<br>闭环</div>
+        <div style="font-family:var(--sans-zh); font-size:max(13px,1vw); line-height:1.55; opacity:.8">申请 → 审核 → 局部重排 → 通知，全程留痕</div>
+      </div>
+      <div data-anim style="border-top:2px solid var(--accent); padding-top:1.6vh; display:flex; flex-direction:column; gap:1.2vh">
+        <div style="font-family:var(--mono); font-size:max(12px,1vw); opacity:.55">04</div>
+        <div style="font-family:var(--serif-zh); font-weight:700; font-size:max(18px,1.5vw); line-height:1.3">课表查询<br>服务</div>
+        <div style="font-family:var(--sans-zh); font-size:max(13px,1vw); line-height:1.55; opacity:.8">教师 / 班级 / 教室 / 个人四视图自助查询</div>
+      </div>
+      <div data-anim style="border-top:2px solid var(--accent); padding-top:1.6vh; display:flex; flex-direction:column; gap:1.2vh; background:rgba(49,93,147,.18)">
+        <div style="font-family:var(--mono); font-size:max(12px,1vw); opacity:.55">05</div>
+        <div style="font-family:var(--serif-zh); font-weight:700; font-size:max(18px,1.5vw); line-height:1.3">智能体<br>PiAgent</div>
+        <div style="font-family:var(--sans-zh); font-size:max(13px,1vw); line-height:1.55; opacity:.9">自然语言交互：操作引导 / 约束配置 / 查询统计 / 结果解读</div>
       </div>
     </div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:2vh 2vw; align-content:start">
-      <div class="kicker" data-anim style="grid-column:1/3">关键性能 · KPI</div>
-      <div class="stat-card" data-anim>
-        <div class="stat-label">Scheduling</div>
-        <div class="stat-nb">≤5 <span class="stat-unit">分钟</span></div>
-        <div class="stat-note">排课引擎生成无硬冲突课表</div>
-      </div>
-      <div class="stat-card" data-anim>
-        <div class="stat-label">Detection</div>
-        <div class="stat-nb">100<span class="stat-unit">%</span></div>
-        <div class="stat-note">三类硬约束冲突检出率</div>
-      </div>
-      <div class="stat-card" data-anim>
-        <div class="stat-label">Rescheduling</div>
-        <div class="stat-nb">≤1 <span class="stat-unit">分钟</span></div>
-        <div class="stat-note">调课局部重排反馈</div>
-      </div>
-      <div class="stat-card" data-anim>
-        <div class="stat-label">PiAgent</div>
-        <div class="stat-nb">≤5 <span class="stat-unit">秒</span></div>
-        <div class="stat-note">首响；不可用时降级，核心功能不受影响</div>
-      </div>
+
+    <div class="callout" style="margin-top:4.5vh" data-anim>
+      "PiAgent 只做编排、不做求解——写操作经权限校验与审计留痕。"
+      <div class="callout-src">— 架构职责红线</div>
     </div>
   </div>
   <div class="foot">
     <div>Page 07 · 对所建议系统的说明</div>
-    <div>To-Be Overview</div>
+    <div>TO-BE OVERVIEW</div>
   </div>
 </section>
 
