@@ -1314,56 +1314,44 @@
     <div>可行性 · TECHNOLOGY</div>
     <div>09 / 11</div>
   </div>
-  <div class="frame" style="padding-top:4vh">
+  <div class="frame" style="padding-top:5vh">
     <div class="kicker" data-anim>TECH · 技术条件方面的可行性</div>
     <h2 class="h-xl" data-anim>技术可行性</h2>
-    <p class="lead" style="margin-bottom:1vh" data-anim>核心方法均有四十余年研究积累、公开实现丰富——不存在需要攻关的理论空白。</p>
+    <p class="lead" style="font-size:max(17px,1.4vw)" data-anim>核心方法均有四十年成熟积累、公开实现丰富——没有需要攻关的理论空白。</p>
 
-    <div class="pipeline-section">
-      <div class="pipeline-label">算法路线 · 两阶段求解</div>
-      <div class="pipeline">
-        <div class="step" data-anim="step">
-          <div class="step-nb">01</div>
-          <div class="step-title">约束建模</div>
-          <div class="step-desc">课程—时段—教室三元组，硬约束必须满足</div>
-        </div>
-        <div class="step" data-anim="step">
-          <div class="step-nb">02</div>
-          <div class="step-title">贪心 + 回溯</div>
-          <div class="step-desc">构造无硬冲突的可行解</div>
-        </div>
-        <div class="step" data-anim="step">
-          <div class="step-nb">03</div>
-          <div class="step-title">遗传 / 模拟退火</div>
-          <div class="step-desc">迭代优化软约束（可配置、可对比）</div>
-        </div>
-        <div class="step" data-anim="step">
-          <div class="step-nb">04</div>
-          <div class="step-title">全量冲突检测</div>
-          <div class="step-desc">三类硬约束扫描，毫秒级</div>
-        </div>
+    <div style="display:flex; align-items:flex-start; gap:1vw; margin-top:7vh">
+      <div data-anim style="flex:1">
+        <div style="font-family:var(--serif-en); font-style:italic; font-size:3vw; color:var(--accent-display); line-height:1">01</div>
+        <div style="font-family:var(--serif-zh); font-weight:700; font-size:max(22px,1.9vw); margin-top:1vh">约束建模</div>
+        <div style="font-family:var(--sans-zh); font-size:max(15px,1.15vw); opacity:.75; margin-top:.8vh">课程·时段·教室 三元组建模</div>
+      </div>
+      <div data-anim style="font-size:2vw; color:var(--accent); margin-top:2.2vh">→</div>
+      <div data-anim style="flex:1">
+        <div style="font-family:var(--serif-en); font-style:italic; font-size:3vw; color:var(--accent-display); line-height:1">02</div>
+        <div style="font-family:var(--serif-zh); font-weight:700; font-size:max(22px,1.9vw); margin-top:1vh">贪心 + 回溯</div>
+        <div style="font-family:var(--sans-zh); font-size:max(15px,1.15vw); opacity:.75; margin-top:.8vh">构造无硬冲突可行解</div>
+      </div>
+      <div data-anim style="font-size:2vw; color:var(--accent); margin-top:2.2vh">→</div>
+      <div data-anim style="flex:1">
+        <div style="font-family:var(--serif-en); font-style:italic; font-size:3vw; color:var(--accent-display); line-height:1">03</div>
+        <div style="font-family:var(--serif-zh); font-weight:700; font-size:max(22px,1.9vw); margin-top:1vh">遗传 / 退火</div>
+        <div style="font-family:var(--sans-zh); font-size:max(15px,1.15vw); opacity:.75; margin-top:.8vh">软约束优化·可对比</div>
+      </div>
+      <div data-anim style="font-size:2vw; color:var(--accent); margin-top:2.2vh">→</div>
+      <div data-anim style="flex:1">
+        <div style="font-family:var(--serif-en); font-style:italic; font-size:3vw; color:var(--accent-display); line-height:1">04</div>
+        <div style="font-family:var(--serif-zh); font-weight:700; font-size:max(22px,1.9vw); margin-top:1vh">冲突检测</div>
+        <div style="font-family:var(--sans-zh); font-size:max(15px,1.15vw); opacity:.75; margin-top:.8vh">三类硬约束·毫秒级</div>
       </div>
     </div>
 
-    <div class="grid-3" style="margin-top:3.5vh; gap:2.5vw; align-items:stretch">
-      <div data-anim style="padding:2vh 1.8vw; border-left:3px solid var(--accent)">
-        <div class="kicker" style="opacity:.9">规模可控</div>
-        <p style="margin-top:1.2vh; font-family:var(--sans-zh); font-size:max(15px,1.15vw); line-height:1.6; opacity:.85">
-          约 80 个排课实体 ≪ 文献公开基准（数百门课程），实现风险低。
-        </p>
-      </div>
-      <div data-anim style="padding:2vh 1.8vw; border-left:3px solid currentColor">
-        <div class="kicker" style="opacity:.9">智能体成熟</div>
-        <p style="margin-top:1.2vh; font-family:var(--sans-zh); font-size:max(15px,1.15vw); line-height:1.6; opacity:.85">
-          Function Calling 成熟路线 + 国产大模型 API；PiAgent 只编排、不求解。
-        </p>
-      </div>
-      <div data-anim style="padding:2vh 1.8vw; border-left:3px solid currentColor">
-        <div class="kicker" style="opacity:.9">期限有底</div>
-        <p style="margin-top:1.2vh; font-family:var(--sans-zh); font-size:max(15px,1.15vw); line-height:1.6; opacity:.85">
-          第 12 周「无硬冲突」最低目标——第 14 周演示底线有保证。
-        </p>
-      </div>
+    <div style="margin-top:7vh; border-top:1px solid var(--line); padding-top:3vh">
+      <p data-anim style="font-family:var(--sans-zh); font-size:max(19px,1.5vw); line-height:1.6">
+        约 <b style="color:var(--accent-ink)">80</b> 个排课实体 <b>≪</b> 数百门课程公开基准 —— <b>实现风险低</b>
+      </p>
+      <p data-anim style="font-family:var(--sans-zh); font-size:max(16px,1.25vw); opacity:.8; margin-top:1.6vh; line-height:1.7">
+        智能体：Function Calling 成熟路线，只编排不求解　｜　期限：第 12 周「无硬冲突」最低目标 · 第 14 周演示底线
+      </p>
     </div>
   </div>
   <div class="foot">
