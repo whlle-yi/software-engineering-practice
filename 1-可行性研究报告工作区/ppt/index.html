@@ -1314,52 +1314,45 @@
     <div>可行性 · TECHNOLOGY</div>
     <div>09 / 12</div>
   </div>
-  <div class="frame" style="padding-top:5vh">
+  <div class="frame" style="padding-top:3vh">
     <div class="kicker" data-anim>TECH · 技术条件方面的可行性</div>
-    <h2 class="h-xl" data-anim>技术可行性</h2>
-    <p class="lead" style="font-size:max(17px,1.4vw)" data-anim>五个板块，每个都用成熟方法解决——没有需要攻关的理论空白。</p>
-    <div style="display:flex; align-items:flex-start; gap:1vw; margin-top:8vh">
-      <div data-anim style="flex:1">
-        <div style="font-family:var(--sans-zh); font-size:max(14px,1.05vw); color:var(--accent-ink); letter-spacing:.12em">排课引擎</div>
-        <div style="font-family:var(--serif-en); font-style:italic; font-size:3vw; color:var(--accent-display); line-height:1; margin-top:.6vh">01</div>
-        <div style="font-family:var(--serif-zh); font-weight:700; font-size:max(22px,1.9vw); margin-top:.8vh">约束建模</div>
-        <div style="font-family:var(--sans-zh); font-size:max(15px,1.15vw); opacity:.75; margin-top:.8vh">课程·时段·教室 三元组建模</div>
+    <h2 class="h-xl" data-anim>四项技术，逐项核对</h2>
+    <p class="lead" style="font-size:max(17px,1.4vw)" data-anim>排课功能目标可分解为四件事——每一项都有成熟方法，没有需要攻关的理论空白。</p>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:2.4vh 3vw; margin-top:3vh">
+      <div data-anim style="padding:1.8vh 1.8vw; border-left:3px solid var(--accent); background:rgba(255,255,255,.03)">
+        <div style="display:flex; align-items:baseline; gap:.9vw">
+          <span style="font-family:var(--serif-en); font-style:italic; font-size:2.2vw; color:var(--accent-display); line-height:1">01</span>
+          <span style="font-family:var(--serif-zh); font-weight:700; font-size:max(24px,2.1vw)">约束建模</span>
+        </div>
+        <p style="margin-top:1.6vh; font-family:var(--sans-zh); font-size:max(16px,1.28vw); line-height:1.65; opacity:.85">采用经典的<b>「变量 + 约束」</b>表示法：变量为「课程—时段—教室」三元组，约束分硬约束与软约束两类。</p>
       </div>
-      <div data-anim style="font-size:2vw; color:var(--accent); margin-top:4.5vh">→</div>
-      <div data-anim style="flex:1">
-        <div style="font-family:var(--sans-zh); font-size:max(14px,1.05vw); color:var(--accent-ink); letter-spacing:.12em">排课引擎</div>
-        <div style="font-family:var(--serif-en); font-style:italic; font-size:3vw; color:var(--accent-display); line-height:1; margin-top:.6vh">02</div>
-        <div style="font-family:var(--serif-zh); font-weight:700; font-size:max(22px,1.9vw); margin-top:.8vh">贪心 + 回溯</div>
-        <div style="font-family:var(--sans-zh); font-size:max(15px,1.15vw); opacity:.75; margin-top:.8vh">构造无硬冲突可行解</div>
+      <div data-anim style="padding:1.8vh 1.8vw; border-left:3px solid var(--accent); background:rgba(255,255,255,.03)">
+        <div style="display:flex; align-items:baseline; gap:.9vw">
+          <span style="font-family:var(--serif-en); font-style:italic; font-size:2.2vw; color:var(--accent-display); line-height:1">02</span>
+          <span style="font-family:var(--serif-zh); font-weight:700; font-size:max(24px,2.1vw)">搜索求解</span>
+        </div>
+        <p style="margin-top:1.6vh; font-family:var(--sans-zh); font-size:max(16px,1.28vw); line-height:1.65; opacity:.85">先以<b>贪心加回溯</b>构造初始可行解，再用<b>遗传算法或模拟退火</b>优化软约束——两种算法均有大量公开文献与开源实现可参照。</p>
       </div>
-      <div data-anim style="font-size:2vw; color:var(--accent); margin-top:4.5vh">→</div>
-      <div data-anim style="flex:1">
-        <div style="font-family:var(--sans-zh); font-size:max(14px,1.05vw); color:var(--accent-ink); letter-spacing:.12em">排课引擎</div>
-        <div style="font-family:var(--serif-en); font-style:italic; font-size:3vw; color:var(--accent-display); line-height:1; margin-top:.6vh">03</div>
-        <div style="font-family:var(--serif-zh); font-weight:700; font-size:max(22px,1.9vw); margin-top:.8vh">遗传 / 退火</div>
-        <div style="font-family:var(--sans-zh); font-size:max(15px,1.15vw); opacity:.75; margin-top:.8vh">软约束优化·可对比</div>
+      <div data-anim style="padding:1.8vh 1.8vw; border-left:3px solid var(--accent); background:rgba(255,255,255,.03)">
+        <div style="display:flex; align-items:baseline; gap:.9vw">
+          <span style="font-family:var(--serif-en); font-style:italic; font-size:2.2vw; color:var(--accent-display); line-height:1">03</span>
+          <span style="font-family:var(--serif-zh); font-weight:700; font-size:max(24px,2.1vw)">冲突检测</span>
+        </div>
+        <p style="margin-top:1.6vh; font-family:var(--sans-zh); font-size:max(16px,1.28vw); line-height:1.65; opacity:.85">对硬约束做<b>全量扫描</b>：逻辑简单、可穷尽，能给出「硬冲突为零」的结构化保证。</p>
       </div>
-      <div data-anim style="font-size:2vw; color:var(--accent); margin-top:4.5vh">→</div>
-      <div data-anim style="flex:1">
-        <div style="font-family:var(--sans-zh); font-size:max(14px,1.05vw); color:var(--accent-ink); letter-spacing:.12em">冲突检测</div>
-        <div style="font-family:var(--serif-en); font-style:italic; font-size:3vw; color:var(--accent-display); line-height:1; margin-top:.6vh">04</div>
-        <div style="font-family:var(--serif-zh); font-weight:700; font-size:max(22px,1.9vw); margin-top:.8vh">全量扫描</div>
-        <div style="font-family:var(--sans-zh); font-size:max(15px,1.15vw); opacity:.75; margin-top:.8vh">三类硬约束·毫秒级检出</div>
-      </div>
-      <div data-anim style="font-size:2vw; color:var(--accent); margin-top:4.5vh">→</div>
-      <div data-anim style="flex:1">
-        <div style="font-family:var(--sans-zh); font-size:max(14px,1.05vw); color:var(--accent-ink); letter-spacing:.12em">智能体 PiAgent</div>
-        <div style="font-family:var(--serif-en); font-style:italic; font-size:3vw; color:var(--accent-display); line-height:1; margin-top:.6vh">05</div>
-        <div style="font-family:var(--serif-zh); font-weight:700; font-size:max(22px,1.9vw); margin-top:.8vh">Function Calling</div>
-        <div style="font-family:var(--sans-zh); font-size:max(15px,1.15vw); opacity:.75; margin-top:.8vh">自然语言引导与配置·只编排不求解</div>
+      <div data-anim style="padding:1.8vh 1.8vw; border-left:3px solid var(--accent); background:rgba(255,255,255,.03)">
+        <div style="display:flex; align-items:baseline; gap:.9vw">
+          <span style="font-family:var(--serif-en); font-style:italic; font-size:2.2vw; color:var(--accent-display); line-height:1">04</span>
+          <span style="font-family:var(--serif-zh); font-weight:700; font-size:max(24px,2.1vw)">自然语言交互</span>
+        </div>
+        <p style="margin-top:1.6vh; font-family:var(--sans-zh); font-size:max(16px,1.28vw); line-height:1.65; opacity:.85">内置智能体 <b>PiAgent</b> 基于大语言模型的<b>函数调用机制</b>实现——只做意图理解与编排，不承担求解。</p>
       </div>
     </div>
 
-    <div style="margin-top:8vh; border-top:1px solid var(--line); padding-top:3vh">
-      <p data-anim style="font-family:var(--sans-zh); font-size:max(19px,1.5vw); line-height:1.6">
-        方法均有<b>四十余年研究积累</b>、公开实现丰富——<b>技术上可行</b>
-      </p>
-    </div>
+    <p data-anim style="font-family:var(--sans-zh); font-size:max(17px,1.35vw); margin-top:1.8vh; padding-top:1.5vh; border-top:1px solid var(--line)">
+      四项技术<b>均无未解决的理论难点</b>，功能目标能够达到。
+    </p>
   </div>
   <div class="foot">
     <div>Page 09 · 技术条件方面的可行性</div>
