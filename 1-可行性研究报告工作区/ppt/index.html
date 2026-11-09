@@ -2584,6 +2584,24 @@ window.__pptPresenter?.initMode();
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>lucide.createIcons();</script>
 
+<!-- file:// 直接双击打开时的静态兜底：ES module 被 CORS 拦截时强制内容可见 -->
+<script>
+(function(){
+  if (location.protocol !== 'file:') return;
+  var reveal = function(){
+    document.querySelectorAll('[data-anim]').forEach(function(el){
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+    });
+    document.body.classList.remove('motion-ready');
+  };
+  reveal();
+  var n = 0, timer = setInterval(function(){ reveal(); if (++n > 40) clearInterval(timer); }, 150);
+  document.addEventListener('DOMContentLoaded', reveal);
+  window.addEventListener('load', reveal);
+})();
+</script>
+
 <!-- ============ Motion One 动效引擎（本地优先,CDN 兜底） ============
      加载策略:先 ./assets/motion.min.js(本地,离线可用),失败 fallback 到 jsDelivr CDN
      加载完成后挂 window.__playSlide / window.__pipeAdvance,
