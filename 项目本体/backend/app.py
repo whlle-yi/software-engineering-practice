@@ -5,6 +5,7 @@
 鉴权经 auth.authorize(domain, action)，未授权返回 401/403。
 """
 import json
+import os
 from datetime import datetime
 
 from flask import Flask, request, jsonify, Response
@@ -20,7 +21,9 @@ import agent as m7
 from dao import audit_query
 from models import db, Term, Teacher, Classroom, Course, ClassInfo, SysUser, TeacherPreference, PendingItem
 
-app = Flask(__name__)
+FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
+app = Flask(__name__, static_folder=os.path.join(FRONTEND_DIR, "static"),
+           static_url_path="/static")
 app.config.from_object(config)
 db.init_app(app)
 
@@ -379,20 +382,12 @@ def api_audit_list():
 
 # ---------------- 前端托管（Vue 3 CDN 单页，静态资源本地化） ----------------
 import os
-FRONTEND = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
-
-from flask import send_from_directory
 
 
 @app.get("/")
 def index():
-    with open(os.path.join(FRONTEND, "index.html"), encoding="utf-8") as f:
+    with open(os.path.join(FRONTEND_DIR, "index.html"), encoding="utf-8") as f:
         return f.read()
-
-
-@app.get("/static/<path:filename>")
-def static_files(filename):
-    return send_from_directory(FRONTEND, "static", filename)
 
 
 # ---------------- 初始化 ----------------
