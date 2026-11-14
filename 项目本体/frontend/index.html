@@ -54,7 +54,7 @@
   </div>
 
   <!-- 主界面 -->
-  <template v-else>
+  <template v-if="token">
     <header>
       <h1>PiAgent 赋能的高校排课系统 · 原型</h1>
       <div class="who">{{ loginName }}（{{ roleCN }}）
@@ -179,9 +179,9 @@
           <tr><th>节次</th><th>周一</th><th>周二</th><th>周三</th><th>周四</th><th>周五</th></tr>
           <tr v-for="p in 4"><td>第 {{ p }} 节</td>
             <td v-for="d in 5">
-              <template v-for="r in ttRows" v-if="r.day===d && r.period===p">
+              <div v-for="r in cellFor(d, p)" :key="r.record_id">
                 {{ r.course }}<br><small>{{ r.teacher }} @{{ r.room }}</small>
-              </template>
+              </div>
             </td></tr>
         </table>
       </div>
@@ -268,15 +268,19 @@ Vue.createApp({
       if (this.role !== "admin") { await this.loadNotify(); }
     },
     async loadHome() {
-      const d = await api("GET", "/api/engine/report"); this.stats = d.data || {};
       const b = await api("GET", "/api/base/teachers"); this.teachers = b.data || [];
       const c = await api("GET", "/api/base/classes"); this.classes = c.data || [];
       const r = await api("GET", "/api/base/rooms"); this.rooms = r.data || [];
       const co = await api("GET", "/api/base/courses"); this.courses = co.data || [];
+      const tk = await api("GET", "/api/base/tasks"); this.tasks = tk.data || [];
+      const d = await api("GET", "/api/engine/report"); const rep = d.data || {};
       const a = await api("GET", "/api/audit/list"); this.audits = a.data || [];
       const cs = await api("GET", "/api/constraint/list");
       this.constraints = cs.data.constraints; this.preferences = cs.data.preferences;
       const pd = await api("GET", "/api/agent/pending"); this.pendings = pd.data || [];
+      this.stats = {teachers: this.teachers.length, courses: this.courses.length,
+        classes: this.classes.length, tasks: this.tasks.length,
+        records: rep.records || 0, conflicts: rep.hard_conflicts == null ? "—" : rep.hard_conflicts};
     },
     async solve() {
       this.solving = true; this.solveReport = "";
@@ -346,6 +350,9 @@ Vue.createApp({
       const d = await api("GET", url);
       if (d.code !== 0) { this.flashMsg(d.message, "err"); return; }
       this.ttRows = d.data.rows;
+    },
+    cellFor(d, p) {
+      return this.ttRows.filter(r => r.day === d && r.period === p);
     },
     exportUrl(fmt) {
       if (this.role === "teacher") return "/api/query/export?view=teacher&fmt=" + fmt;
