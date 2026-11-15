@@ -87,6 +87,8 @@
   .timetable td.pd { font-size:13px; color:#5A6B82; }
   .timetable td.seg-row { background:#EDF1F7; color:var(--pri-deep); font-weight:bold;
                           font-size:13px; text-align:center; height:30px; }
+  .timetable .cell { margin:3px; padding:5px 6px; border-radius:6px;
+                     font-size:13px; line-height:1.5; }
   .timetable small { color:#5A6B82; }
   .chat { max-height:380px; overflow-y:auto; border:1px solid var(--line);
           padding:14px; margin-bottom:10px; border-radius:6px; }
@@ -318,13 +320,12 @@
                   <td v-if="s.header" colspan="6" class="seg-row">{{ s.label }}</td>
                   <template v-else>
                     <td class="pd">第 {{ s.period }} 节</td>
-                    <template v-for="c in rowCells(s.period)">
-                      <td v-if="!c.skip" :rowspan="c.span">
-                        <div v-for="r in c.recs" :key="r.record_id">
-                          {{ r.course }}<br><small>{{ r.teacher }} @{{ r.room }}</small>
-                        </div>
-                      </td>
-                    </template>
+                    <td v-for="d in 5" :key="d" :style="{background: cellBg(d, s.period)}">
+                      <div class="cell" v-if="cellFor(d, s.period)">
+                        {{ cellFor(d, s.period).course }}<br>
+                        <small>{{ cellFor(d, s.period).teacher }} @{{ cellFor(d, s.period).room }}</small>
+                      </div>
+                    </td>
                   </template>
                 </tr>
               </table>
@@ -374,13 +375,12 @@
                 <td v-if="s.header" colspan="6" class="seg-row">{{ s.label }}</td>
                 <template v-else>
                   <td class="pd">第 {{ s.period }} 节</td>
-                  <template v-for="c in rowCells(s.period)">
-                    <td v-if="!c.skip" :rowspan="c.span">
-                      <div v-for="r in c.recs" :key="r.record_id">
-                        {{ r.course }}<br><small>{{ r.room }}</small>
-                      </div>
-                    </td>
-                  </template>
+                  <td v-for="d in 5" :key="d" :style="{background: cellBg(d, s.period)}">
+                    <div class="cell" v-if="cellFor(d, s.period)">
+                      {{ cellFor(d, s.period).course }}<br>
+                      <small>{{ cellFor(d, s.period).room }}</small>
+                    </div>
+                  </td>
                 </template>
               </tr>
             </table>
@@ -424,13 +424,12 @@
               <td v-if="s.header" colspan="6" class="seg-row">{{ s.label }}</td>
               <template v-else>
                 <td class="pd">第 {{ s.period }} 节</td>
-                <template v-for="c in rowCells(s.period)">
-                  <td v-if="!c.skip" :rowspan="c.span">
-                    <div v-for="r in c.recs" :key="r.record_id">
-                      {{ r.course }}<br><small>{{ r.teacher }} @{{ r.room }}</small>
-                    </div>
-                  </td>
-                </template>
+                <td v-for="d in 5" :key="d" :style="{background: cellBg(d, s.period)}">
+                  <div class="cell" v-if="cellFor(d, s.period)">
+                    {{ cellFor(d, s.period).course }}<br>
+                    <small>{{ cellFor(d, s.period).teacher }} @{{ cellFor(d, s.period).room }}</small>
+                  </div>
+                </td>
               </template>
             </tr>
           </table>
@@ -568,6 +567,17 @@ Vue.createApp({
         pending: Array.isArray(this.pendings) ? this.pendings.length : 0,
       };
     },
+    coursePalette() {   // 课程 → 颜色映射（首次出现顺序分配，避免撞色）
+      const palette = ["#E8F1FB", "#E6F4EA", "#FDF2E3", "#F3EFFB", "#FDECEF",
+                       "#E0F4F4", "#FFF8E1", "#EEF3E2", "#EAF4FD", "#FBEFF5",
+                       "#EFEFF9", "#E5F6EF"];
+      const map = {};
+      let i = 0;
+      this.ttRows.forEach(r => {
+        if (!(r.course in map)) map[r.course] = palette[i++ % palette.length];
+      });
+      return map;
+    },
     slotRows() {   // 11 行课表骨架：上午 1-4 / 下午 5-8 / 晚上 10-12（无第 9 节），带时段分隔行
       const rows = [];
       const segs = [["上午", [1, 2, 3, 4]], ["下午", [5, 6, 7, 8]], ["晚上", [10, 11, 12]]];
@@ -576,24 +586,6 @@ Vue.createApp({
         periods.forEach(p => rows.push({key: label + p, period: p}));
       }
       return rows;
-    },
-    ttSegs() {   // 课表连排段：同任务同天相邻节次合并为 {day, start, span, recs}
-      const byTask = {};
-      this.ttRows.forEach(r => { (byTask[r.task_id] = byTask[r.task_id] || []).push(r); });
-      const segs = [];
-      Object.values(byTask).forEach(list => {
-        list.sort((a, b) => a.day - b.day || a.period - b.period);
-        let cur = null;
-        list.forEach(r => {
-          if (cur && cur.day === r.day && cur.start + cur.span === r.period) {
-            cur.span++; cur.recs.push(r);
-          } else {
-            cur = {day: r.day, start: r.period, span: 1, recs: [r]};
-            segs.push(cur);
-          }
-        });
-      });
-      return segs;
     },
   },
   watch: {
@@ -714,14 +706,15 @@ Vue.createApp({
       if (d.code !== 0) { this.flashMsg(d.message, "err"); return; }
       this.ttRows = d.data.rows;
     },
-    rowCells(p) {   // 连排块渲染：段起点输出 rowspan 格，段内其余节跳过
-      const out = [];
-      for (let d = 1; d <= 5; d++) {
-        const blk = this.ttSegs.find(s => s.day === d && s.start === p);
-        const covered = this.ttSegs.some(s => s.day === d && p > s.start && p < s.start + s.span);
-        out.push(covered ? {skip: true} : {day: d, span: blk ? blk.span : 1, recs: blk ? blk.recs : []});
-      }
-      return out;
+    cellFor(d, p) {   // 每节一格：返回该节次的课表记录（块模型下每节一行）
+      return this.ttRows.find(r => r.day === d && r.period === p) || null;
+    },
+    courseColor(course) {   // 同课程同色：按课表内出现顺序分配调色板色
+      return this.coursePalette[course] || "";
+    },
+    cellBg(d, p) {
+      const r = this.cellFor(d, p);
+      return r ? this.courseColor(r.course) : "";
     },
     exportUrl(fmt) {
       if (this.role === "teacher") return "/api/query/export?view=teacher&fmt=" + fmt;
