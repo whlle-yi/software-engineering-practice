@@ -36,19 +36,19 @@ def test_unique_small_case_converges():
     assert len(sol.assign) == 3                     # 每任务 1 块
     assert hard_conflicts(sol, m) == []
     for bkey, (d, p0, rid) in sol.assign.items():
-        assert 1 <= p0 <= 2                         # 3 节块起始位合法（1-3 / 2-4 节）
+        assert p0 in (1, 5, 10)                     # 3 节块只允许上午 1-3 / 下午 5-7 / 晚上 10-12
 
 
 def test_four_hours_task_splits_into_two_blocks():
-    """4 学时任务拆 2 块 2 节；两块必须排在不同天（一次连排只能是 2 或 3 节）。"""
+    """4 学时任务拆 2 块 2 节；起始合法且两块排在不同天（一次连排只能是 2 或 3 节）。"""
     tasks = [(1, 4, 30, 101, 201)]
     m = make_model(tasks)
     sol, err = greedy_construct(m, {})
     assert err is None
     keys = sorted(sol.assign.keys())
     assert keys == [(1, 0), (1, 1)]
-    assert all(sol.assign[k][1] in (1, 2, 3) for k in keys)   # 2 节块起始 1~3
-    assert sol.assign[(1, 0)][0] != sol.assign[(1, 1)][0]     # 两块不同天
+    assert all(sol.assign[k][1] in (1, 3, 5, 7, 10) for k in keys)   # 2 节块合法起点
+    assert sol.assign[(1, 0)][0] != sol.assign[(1, 1)][0]            # 两块不同天
 
 
 def test_teacher_conflict_forces_different_slots():

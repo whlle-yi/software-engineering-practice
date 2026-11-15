@@ -73,11 +73,20 @@ def _teacher_by_no(tno):
     return Teacher.query.filter_by(tno=str(tno).strip()).first()
 
 
-def _merge_blocks(rows, fmt):
-    """同一任务在同一天的连续节次合并为一个连排段（"第1-2节"），段间独立成行。
+def _period_seg(p):
+    """节次 → 时段名（上午 1-4 / 下午 5-8 / 晚上 10-12，无第 9 节）。"""
+    return "上午" if p <= 4 else ("下午" if p <= 8 else "晚上")
 
-    seg 元组约定：[day, "p0-p1", 课程, 教师, 教室]（教师/教室列可由 fmt 决定取用）。
+
+def _merge_blocks(rows, fmt):
+    """同一任务在同一天的连续节次合并为一个连排段（"上午 第1-2节"），段间独立成行。
+
+    seg 元组约定：[day, "时段 节次串", 课程, 教师, 教室]（列由 fmt 决定取用）。
     """
+    def label(start, end):
+        rng = "第%d节" % start if start == end else "第%d-%d节" % (start, end)
+        return _period_seg(start) + " " + rng
+
     out, cur = [], None
     for r in rows:
         cname = r.task.course.name if r.task.course else ""
@@ -88,16 +97,12 @@ def _merge_blocks(rows, fmt):
             cur["end"] = r.period
         else:
             if cur:
-                out.append(fmt([cur["day"],
-                                "第%d节" % cur["start"] if cur["start"] == cur["end"]
-                                else "第%d-%d节" % (cur["start"], cur["end"]),
+                out.append(fmt([cur["day"], label(cur["start"], cur["end"]),
                                 cur["tail"][0], cur["tail"][1], cur["tail"][2]]))
             cur = {"tid": r.task_id, "day": r.day, "start": r.period,
                    "end": r.period, "tail": (cname, tname, room)}
     if cur:
-        out.append(fmt([cur["day"],
-                        "第%d节" % cur["start"] if cur["start"] == cur["end"]
-                        else "第%d-%d节" % (cur["start"], cur["end"]),
+        out.append(fmt([cur["day"], label(cur["start"], cur["end"]),
                         cur["tail"][0], cur["tail"][1], cur["tail"][2]]))
     return out
 

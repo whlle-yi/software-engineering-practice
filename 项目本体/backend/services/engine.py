@@ -22,7 +22,23 @@ CourseHoursCache = {}     # 课程学时缓存（solve 前由 refresh_caches 填
 ClassSizeCache = {}       # 班级人数缓存
 
 DAY_SLOTS = list(range(1, 6))       # 周一~周五
-PERIOD_SLOTS = list(range(1, 5))    # 1~4 大节
+
+# 每日 12 节分三时段（无第 9 节）：上午 1-4、下午 5-8、晚上 10-12
+SEGMENTS = [("上午", [1, 2, 3, 4]), ("下午", [5, 6, 7, 8]), ("晚上", [10, 11, 12])]
+PERIOD_SLOTS = [p for _n, ps in SEGMENTS for p in ps]   # [1..8, 10, 11, 12] 共 11 节
+
+
+def block_starts(length):
+    """连排块合法起始节（一次上课只能是 2 或 3 节，组合固定）：
+    2 节块：上午 1-2 / 3-4，下午 5-6 / 7-8，晚上 10-11 → 起始 [1,3,5,7,10]；
+    3 节块：上午 1-3，下午 5-7，晚上 10-12 → 起始 [1,5,10]。"""
+    starts = []
+    for _name, ps in SEGMENTS:
+        if length == 2:
+            starts += [ps[0], ps[2]] if len(ps) >= 4 else [ps[0]]
+        elif length == 3:
+            starts.append(ps[0])           # 各时段前三节
+    return starts
 
 
 def hours_to_blocks(hours):
@@ -63,7 +79,6 @@ class Model:
         self.rooms = rooms                       # [(room_id, capacity, rtype)]
         self.hard = hard_rules
         self.soft = soft_rules                   # [(weight, type, params)] 教师/管理员软约束
-        self.slots = [(d, p) for d in DAY_SLOTS for p in PERIOD_SLOTS]
         self.class_size = {t[0]: t[2] for t in tasks}
         self.task_teacher = {t[0]: t[3] for t in tasks}
         self.task_class = {t[0]: t[4] for t in tasks}
@@ -141,7 +156,7 @@ def soft_score(sol: Solution, model: Model, prefs_by_teacher, soft_rules):
                 score += pref.get("weight", 2)
             elif pref["type"] == "avoid" and pref.get("day") == d:
                 score -= pref.get("weight", 2)
-            elif pref["type"] == "consecutive" and p0 in (1, 3):
+            elif pref["type"] == "consecutive" and p0 in (1, 3, 5, 10):
                 score += pref.get("weight", 1)
     for rule in soft_rules:
         w = rule.get("weight", 2)
@@ -180,7 +195,7 @@ def greedy_construct(model: Model, prefs_by_teacher):
         for d in DAY_SLOTS:
             if d in used_days:                     # 同任务块必须不同天
                 continue
-            for p0 in range(1, len(PERIOD_SLOTS) - L + 2):
+            for p0 in block_starts(L):             # 段内合法连排组合
                 ps = range(p0, p0 + L)
                 if any((d, p, tch) in teacher_busy for p in ps):
                     continue
@@ -225,11 +240,11 @@ def greedy_construct(model: Model, prefs_by_teacher):
 
 
 def neighbor(sol: Solution, model: Model, rng):
-    """邻域：随机选一块重排至随机可行位（详设 6.6 阶段二邻域）。"""
+    """邻域：随机选一块重排至随机合法位（详设 6.6 阶段二邻域）。"""
     bkey = rng.choice(list(sol.assign.keys()))
     b = model.block_by_key[bkey]
     d = rng.choice(DAY_SLOTS)
-    p0 = rng.randrange(1, len(PERIOD_SLOTS) - b["len"] + 2)
+    p0 = rng.choice(block_starts(b["len"]))
     rid, _cap, _rt = rng.choice(model.feasible_rooms(b["task"]))
     new = sol.copy()
     new.assign[bkey] = (d, p0, rid)
