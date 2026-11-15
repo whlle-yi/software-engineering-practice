@@ -30,6 +30,9 @@
 设置环境变量 `LLM_API_KEY`（国产大模型 OpenAI 兼容 key）、`LLM_BASE_URL`（默认智谱 v4）、`LLM_MODEL`（默认 glm-4-flash）后重启，PiAgent 自动从桩切到真实函数调用；未配置时为桩模式（编排与校验逻辑完全一致）。
 
 ## 目录
-- `backend/`：M1–M8 每模块一个文件（app.py 为入口与路由）＋ models.py（13 表）＋ seed_data.py。
+- `backend/`：应用工厂 app.py（create_app）＋ `blueprints/` 按业务域拆分的路由（auth/base/constraint/engine/adjust/query/agent/audit，对应 M1~M8）＋ `services/` 业务层（同名文件）＋ models.py（13 表）＋ extensions.py ＋ config.py（分环境类式配置）＋ seed_data.py。
 - `frontend/`：index.html（Vue 3 单页）＋ static/vue.global.prod.js（本地化，离线可用）。
-- `tests/`：pytest 13 用例。`db/schema.sql`：建库脚本。
+- `tests/`：conftest.py 共享 fixtures ＋ pytest 13 用例。`db/schema.sql`：建库脚本。
+- `.env.example`：环境变量样例（复制为 `.env`，本机凭据不入库）。`.gitignore`：本地生成物排除。
+- `requirements.txt`：版本锁定。
+启动与测试均在 `backend/` 目录执行（`python app.py`）；pytest 在项目本体根执行。
