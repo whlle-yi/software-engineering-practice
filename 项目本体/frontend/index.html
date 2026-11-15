@@ -15,7 +15,7 @@
   header h1 { font-size:19px; font-weight:bold; }
   header .who { font-size:14px; }
   header .who button { margin-left:14px; background:rgba(255,255,255,.15); font-size:13px; }
-  .shell { display:flex; min-height:calc(100vh - 55px); }
+  .shell { display:flex; min-height:calc(100vh - 65px); }
   aside { width:170px; background:var(--pri-deep); color:#fff; padding:12px 0;
           flex-shrink:0; transition:width .18s ease; overflow:hidden; }
   aside.collapsed { width:62px; }
@@ -43,6 +43,9 @@
   table { width:100%; border-collapse:collapse; font-size:14px; }
   th,td { border:1px solid var(--line); padding:10px 12px; text-align:center; }
   th { background:#EDF1F7; color:var(--pri-deep); }
+  .tbl-scroll { max-height:460px; overflow-y:auto; }
+  .tbl-scroll th { position:sticky; top:0; box-shadow:inset 0 -1px var(--line); }
+  .tbl-fill { height:calc(100vh - 391px); min-height:200px; max-height:none; }
   button { background:var(--pri); color:#fff; border:none; border-radius:6px;
            padding:9px 20px; cursor:pointer; font-size:15px; }
   button:hover { filter:brightness(1.1); }
@@ -202,10 +205,12 @@
           </div>
           <div class="card">
             <h3>已导入的开课任务（{{ tasks.length }} 条）</h3>
-            <table>
-              <tr><th>课程</th><th>教师</th><th>班级</th><th>周次</th></tr>
-              <tr v-for="t in tasks"><td>{{ t.course }}</td><td>{{ t.teacher }}</td><td>{{ t["class"] }}</td><td>{{ t.weeks }}</td></tr>
-            </table>
+            <div class="tbl-scroll tbl-fill">
+              <table>
+                <tr><th>课程</th><th>教师</th><th>班级</th><th>周次</th></tr>
+                <tr v-for="t in tasks"><td>{{ t.course }}</td><td>{{ t.teacher }}</td><td>{{ t["class"] }}</td><td>{{ t.weeks }}</td></tr>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -231,12 +236,14 @@
           </div>
           <div class="card">
             <h3>教师偏好（确认后才会参与排课）</h3>
-            <table><tr><th>教师</th><th>类型</th><th>内容</th><th>状态</th><th>操作</th></tr>
-              <tr v-for="p in preferences"><td>{{ p.teacher_id }}</td><td>{{ p.ptype }}</td><td>{{ p.content }}</td><td>{{ p.status }}</td><td>
-                <button v-if="p.status==='草稿'" @click="prefStatus(p,'已启用')">启用</button>
-                <button v-if="p.status==='已启用'" class="warn" @click="prefStatus(p,'已停用')">停用</button>
-              </td></tr>
-            </table>
+            <div class="tbl-scroll">
+              <table><tr><th>教师</th><th>类型</th><th>内容</th><th>状态</th><th>操作</th></tr>
+                <tr v-for="p in preferences"><td>{{ p.teacher_id }}</td><td>{{ p.ptype }}</td><td>{{ p.content }}</td><td>{{ p.status }}</td><td>
+                  <button v-if="p.status==='草稿'" @click="prefStatus(p,'已启用')">启用</button>
+                  <button v-if="p.status==='已启用'" class="warn" @click="prefStatus(p,'已停用')">停用</button>
+                </td></tr>
+              </table>
+            </div>
           </div>
           <div class="card">
             <h3>PiAgent 待确认项</h3>
@@ -292,13 +299,15 @@
         <div v-if="role==='admin' && tab==='adjust'">
           <div class="card">
             <h3>调课申请列表</h3>
-            <table><tr><th>申请</th><th>原安排</th><th>期望</th><th>原因</th><th>状态</th><th>操作</th></tr>
-              <tr v-for="r in adjusts"><td>#{{ r.id }}</td><td>{{ r.original }}</td><td>{{ r.expectation }}</td><td>{{ r.reason }}</td>
-                <td>{{ r.status }}<div v-if="r.review_comment" style="font-size:12px;color:#666">{{ r.review_comment }}</div></td>
-                <td v-if="r.status==='待审核'"><button @click="review(r,'通过')">通过</button> <button class="warn" @click="review(r,'退回')">退回</button></td>
-                <td v-else>—</td></tr>
-              <tr v-if="!adjusts.length"><td colspan="6">暂无调课申请</td></tr>
-            </table>
+            <div class="tbl-scroll">
+              <table><tr><th>申请</th><th>原安排</th><th>期望</th><th>原因</th><th>状态</th><th>操作</th></tr>
+                <tr v-for="r in adjusts"><td>#{{ r.id }}</td><td>{{ r.original }}</td><td>{{ r.expectation }}</td><td>{{ r.reason }}</td>
+                  <td>{{ r.status }}<div v-if="r.review_comment" style="font-size:12px;color:#666">{{ r.review_comment }}</div></td>
+                  <td v-if="r.status==='待审核'"><button @click="review(r,'通过')">通过</button> <button class="warn" @click="review(r,'退回')">退回</button></td>
+                  <td v-else>—</td></tr>
+                <tr v-if="!adjusts.length"><td colspan="6">暂无调课申请</td></tr>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -306,9 +315,11 @@
         <div v-if="role==='admin' && tab==='audit'">
           <div class="card">
             <h3>操作留痕（最近 100 条）</h3>
-            <table><tr><th>时间</th><th>操作者</th><th>动作</th><th>对象</th><th>详情</th></tr>
-              <tr v-for="a in audits"><td>{{ a.created_at }}</td><td>{{ a.operator }}</td><td>{{ a.action }}</td><td>{{ a.target }}</td><td>{{ a.detail }}</td></tr>
-            </table>
+            <div class="tbl-scroll">
+              <table><tr><th>时间</th><th>操作者</th><th>动作</th><th>对象</th><th>详情</th></tr>
+                <tr v-for="a in audits"><td>{{ a.created_at }}</td><td>{{ a.operator }}</td><td>{{ a.action }}</td><td>{{ a.target }}</td><td>{{ a.detail }}</td></tr>
+              </table>
+            </div>
           </div>
         </div>
 
