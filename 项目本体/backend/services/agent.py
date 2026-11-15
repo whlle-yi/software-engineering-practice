@@ -73,6 +73,35 @@ def _teacher_by_no(tno):
     return Teacher.query.filter_by(tno=str(tno).strip()).first()
 
 
+def _merge_blocks(rows, fmt):
+    """同一任务在同一天的连续节次合并为一个连排段（"第1-2节"），段间独立成行。
+
+    seg 元组约定：[day, "p0-p1", 课程, 教师, 教室]（教师/教室列可由 fmt 决定取用）。
+    """
+    out, cur = [], None
+    for r in rows:
+        cname = r.task.course.name if r.task.course else ""
+        tname = r.task.teacher.name if r.task.teacher else ""
+        room = r.room.rno if r.room else str(r.room_id)
+        if cur and cur["tid"] == r.task_id and cur["day"] == r.day \
+                and cur["end"] + 1 == r.period and cur["tail"] == (cname, tname, room):
+            cur["end"] = r.period
+        else:
+            if cur:
+                out.append(fmt([cur["day"],
+                                "第%d节" % cur["start"] if cur["start"] == cur["end"]
+                                else "第%d-%d节" % (cur["start"], cur["end"]),
+                                cur["tail"][0], cur["tail"][1], cur["tail"][2]]))
+            cur = {"tid": r.task_id, "day": r.day, "start": r.period,
+                   "end": r.period, "tail": (cname, tname, room)}
+    if cur:
+        out.append(fmt([cur["day"],
+                        "第%d节" % cur["start"] if cur["start"] == cur["end"]
+                        else "第%d-%d节" % (cur["start"], cur["end"]),
+                        cur["tail"][0], cur["tail"][1], cur["tail"][2]]))
+    return out
+
+
 def execute_tool(name, args: dict, operator="", role="admin", ref_id=None):
     """白名单工具执行：先过角色工具集，再按类型执行——read 直调；write 生成待确认项（详设 9.6）。
     返回 (可读结果, 待确认项或None)。教师角色的读写强制绑定本人账号，学生仅只读。"""
@@ -107,10 +136,8 @@ def execute_tool(name, args: dict, operator="", role="admin", ref_id=None):
                     .filter(TeachingTask.teacher_id == t.id)
                     .order_by(ScheduleRecord.day, ScheduleRecord.period).all())
             lines = ["%s（%s）的课表：" % (t.name, t.tno)]
-            for r in rows:
-                lines.append("周%d 第%d节 %s @%s" % (
-                    r.day, r.period,
-                    r.task.course.name if r.task.course else "", r.room.rno if r.room else ""))
+            lines += _merge_blocks(rows, fmt=lambda seg: "周%d 第%s节 %s @%s" % (
+                seg[0], seg[1], seg[2], seg[4]))
             return "\n".join(lines) or "该教师暂无课表", None
         if name == "query_class_schedule":      # 学生：固定查本人班级（只读、防越权）
             st = Student.query.get(ref_id) if ref_id else None
@@ -121,12 +148,8 @@ def execute_tool(name, args: dict, operator="", role="admin", ref_id=None):
                     .filter(TeachingTask.class_id == st.class_id)
                     .order_by(ScheduleRecord.day, ScheduleRecord.period).all())
             lines = ["班级 %s 的课表：" % (cls.name if cls else st.class_id)]
-            for r in rows:
-                lines.append("周%d 第%d节 %s（%s）@%s" % (
-                    r.day, r.period,
-                    r.task.course.name if r.task.course else "",
-                    r.task.teacher.name if r.task.teacher else "",
-                    r.room.rno if r.room else ""))
+            lines += _merge_blocks(rows, fmt=lambda seg: "周%d 第%s节 %s（%s）@%s" % (
+                seg[0], seg[1], seg[2], seg[3], seg[4]))
             return "\n".join(lines) or "本班暂无课表", None
     if meta["type"] == "write":
         if name == "save_teacher_preference":

@@ -100,26 +100,28 @@ def _seed(s):
     courses = []
     for i, name in enumerate(course_names, 1):
         c = Course(cno="C%02d" % i, name=name,
-                   hours=random.choice([2, 3, 4]), ctype=random.choice(["必修", "必修", "选修"]))
+                   hours=([2, 2, 3, 3, 4, 4] * 3 + [2, 3])[i % 20],
+                   ctype=random.choice(["必修", "必修", "选修"]))
         s.add(c)
         courses.append(c)
     s.flush()
 
-    # ---- 开课任务：每班任务数必须 ≤ 每周时段数（5 天×4 节=20，概设硬约束模型）----
-    # 必修 13 门每班全开（130）+ 选修 7 门每班随机 3 门（约 21）→ 合计约 151 条。
+    # ---- 开课任务：连排块模型（2 学时=1 块 2 节；3 学时=1 块 3 节；4 学时=2 块 2 节）----
+    # 每班 6 门课（学时 2,2,3,3,4,4）→ 每班占 18 节 ≤ 每周 20 节容量（概设硬约束模型）。
     task_count = 0
-    required = [c for c in courses if c.ctype == "必修"]
-    elective = [c for c in courses if c.ctype == "选修"]
-    for c in required:
-        for klass in classes:
-            s.add(TeachingTask(term_id=term.id, course_id=c.id,
-                               teacher_id=random.choice([t.id for t in teachers]),
-                               class_id=klass.id, weeks="1-16", note=""))
-            task_count += 1
+    by_hours = {2: [c for c in courses if c.hours == 2],
+                3: [c for c in courses if c.hours == 3],
+                4: [c for c in courses if c.hours == 4]}
+    teacher_pool = [t.id for t in teachers]
+    random.shuffle(teacher_pool)
+    t_idx = 0
     for klass in classes:
-        for c in random.sample(elective, 3):
+        picked = (random.sample(by_hours[2], 2) + random.sample(by_hours[3], 2)
+                  + random.sample(by_hours[4], 2))
+        for c in picked:
             s.add(TeachingTask(term_id=term.id, course_id=c.id,
-                               teacher_id=random.choice([t.id for t in teachers]),
+                               teacher_id=teacher_pool[t_idx % len(teacher_pool)],
                                class_id=klass.id, weeks="1-16", note=""))
+            t_idx += 1
             task_count += 1
-    print("开课任务 %d 条" % task_count)
+    print("开课任务 %d 条（每班 6 门：2,2,3,3,4,4 学时）" % task_count)

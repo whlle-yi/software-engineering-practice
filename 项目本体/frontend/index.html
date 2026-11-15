@@ -312,11 +312,14 @@
               <table class="timetable">
                 <tr><th>节次</th><th>周一</th><th>周二</th><th>周三</th><th>周四</th><th>周五</th></tr>
                 <tr v-for="p in 4"><td>第 {{ p }} 节</td>
-                  <td v-for="d in 5">
-                    <div v-for="r in cellFor(d, p)" :key="r.record_id">
-                      {{ r.course }}<br><small>{{ r.teacher }} @{{ r.room }}</small>
-                    </div>
-                  </td></tr>
+                  <template v-for="c in rowCells(p)">
+                    <td v-if="!c.skip" :rowspan="c.span">
+                      <div v-for="r in c.recs" :key="r.record_id">
+                        {{ r.course }}<br><small>{{ r.teacher }} @{{ r.room }}</small>
+                      </div>
+                    </td>
+                  </template>
+                </tr>
               </table>
             </div>
           </div>
@@ -361,11 +364,14 @@
             <table class="timetable">
               <tr><th>节次</th><th>周一</th><th>周二</th><th>周三</th><th>周四</th><th>周五</th></tr>
               <tr v-for="p in 4"><td>第 {{ p }} 节</td>
-                <td v-for="d in 5">
-                  <div v-for="r in cellFor(d, p)" :key="r.record_id">
-                    {{ r.course }}<br><small>{{ r.room }}</small>
-                  </div>
-                </td></tr>
+                <template v-for="c in rowCells(p)">
+                  <td v-if="!c.skip" :rowspan="c.span">
+                    <div v-for="r in c.recs" :key="r.record_id">
+                      {{ r.course }}<br><small>{{ r.room }}</small>
+                    </div>
+                  </td>
+                </template>
+              </tr>
             </table>
           </div>
         </div>
@@ -404,11 +410,14 @@
           <table class="timetable">
             <tr><th>节次</th><th>周一</th><th>周二</th><th>周三</th><th>周四</th><th>周五</th></tr>
             <tr v-for="p in 4"><td>第 {{ p }} 节</td>
-              <td v-for="d in 5">
-                <div v-for="r in cellFor(d, p)" :key="r.record_id">
-                  {{ r.course }}<br><small>{{ r.teacher }} @{{ r.room }}</small>
-                </div>
-              </td></tr>
+              <template v-for="c in rowCells(p)">
+                <td v-if="!c.skip" :rowspan="c.span">
+                  <div v-for="r in c.recs" :key="r.record_id">
+                    {{ r.course }}<br><small>{{ r.teacher }} @{{ r.room }}</small>
+                  </div>
+                </td>
+              </template>
+            </tr>
           </table>
         </div>
       </main>
@@ -544,6 +553,24 @@ Vue.createApp({
         pending: Array.isArray(this.pendings) ? this.pendings.length : 0,
       };
     },
+    ttSegs() {   // 课表连排段：同任务同天相邻节次合并为 {day, start, span, recs}
+      const byTask = {};
+      this.ttRows.forEach(r => { (byTask[r.task_id] = byTask[r.task_id] || []).push(r); });
+      const segs = [];
+      Object.values(byTask).forEach(list => {
+        list.sort((a, b) => a.day - b.day || a.period - b.period);
+        let cur = null;
+        list.forEach(r => {
+          if (cur && cur.day === r.day && cur.start + cur.span === r.period) {
+            cur.span++; cur.recs.push(r);
+          } else {
+            cur = {day: r.day, start: r.period, span: 1, recs: [r]};
+            segs.push(cur);
+          }
+        });
+      });
+      return segs;
+    },
   },
   watch: {
     tab(v) {   // 切回约束页时拉最新数据（agent 生成待确认项后立即可见）
@@ -663,8 +690,14 @@ Vue.createApp({
       if (d.code !== 0) { this.flashMsg(d.message, "err"); return; }
       this.ttRows = d.data.rows;
     },
-    cellFor(d, p) {
-      return this.ttRows.filter(r => r.day === d && r.period === p);
+    rowCells(p) {   // 连排块渲染：段起点输出 rowspan 格，段内其余节跳过
+      const out = [];
+      for (let d = 1; d <= 5; d++) {
+        const blk = this.ttSegs.find(s => s.day === d && s.start === p);
+        const covered = this.ttSegs.some(s => s.day === d && p > s.start && p < s.start + s.span);
+        out.push(covered ? {skip: true} : {day: d, span: blk ? blk.span : 1, recs: blk ? blk.recs : []});
+      }
+      return out;
     },
     exportUrl(fmt) {
       if (this.role === "teacher") return "/api/query/export?view=teacher&fmt=" + fmt;
