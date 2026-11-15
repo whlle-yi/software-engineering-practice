@@ -111,18 +111,20 @@
   .glass .demo-btn:hover { background:var(--pri); color:#fff; }
   .glass .msg { margin-top:16px; }
   /* ---- PiAgent 悬浮球与悬浮窗（仅管理员可见；机器人形象） ---- */
-  .agent-fab { position:fixed; right:26px; top:78px; width:64px; height:64px;
+  .agent-fab { position:fixed; width:64px; height:64px;
                border-radius:50%; background:var(--pri); border:3px solid #fff;
-               cursor:pointer; box-shadow:0 6px 22px rgba(30,90,160,.4); z-index:60;
-               display:flex; align-items:center; justify-content:center; }
+               cursor:grab; box-shadow:0 6px 22px rgba(30,90,160,.4); z-index:60;
+               display:flex; align-items:center; justify-content:center;
+               touch-action:none; user-select:none; }
   .agent-fab:hover { filter:brightness(1.12); }
   .agent-fab svg { width:44px; height:44px; }
-  .agent-win { position:fixed; right:26px; top:78px; width:380px; height:500px;
+  .agent-win { position:fixed; width:380px; height:500px;
                background:#fff; border-radius:14px; border:1px solid var(--line);
                box-shadow:0 14px 44px rgba(30,90,160,.3); z-index:60;
                display:flex; flex-direction:column; overflow:hidden; }
   .agent-win .aw-head { background:var(--pri-deep); color:#fff; padding:12px 16px;
-                        display:flex; justify-content:space-between; align-items:center; }
+                        display:flex; justify-content:space-between; align-items:center;
+                        cursor:move; touch-action:none; user-select:none; }
   .agent-win .aw-head .t { font-size:15px; font-weight:bold; }
   .agent-win .aw-head button { background:none; font-size:16px; padding:0 4px; }
   .agent-win .chat { flex:1; margin:0; border:none; border-radius:0; }
@@ -389,7 +391,8 @@
 
     <!-- PiAgent 悬浮球与悬浮窗（仅管理员） -->
     <template v-if="role==='admin'">
-      <div class="agent-fab" v-if="!agentOpen" @click="agentOpen = true" title="PiAgent 智能助手">
+      <div class="agent-fab" v-if="!agentOpen" :style="{left: fabPos.x+'px', top: fabPos.y+'px'}"
+        @pointerdown="dragFab" @click="fabClick" title="PiAgent 智能助手（可拖动）">
         <svg viewBox="0 0 64 64">
           <rect x="10" y="14" width="44" height="40" rx="14" fill="#fff"/>
           <rect x="18" y="24" width="28" height="18" rx="9" fill="#16324F"/>
@@ -400,10 +403,10 @@
           <circle cx="32" cy="7" r="3" fill="#F28E2B"/>
         </svg>
       </div>
-      <div class="agent-win" v-else>
-        <div class="aw-head">
+      <div class="agent-win" v-else :style="{left: winPos.x+'px', top: winPos.y+'px'}">
+        <div class="aw-head" @pointerdown="dragWin">
           <span class="t">PiAgent 智能助手（{{ agentMode==='stub' ? '桩模式' : '真实大模型' }}）</span>
-          <button @click="agentOpen = false">✕</button>
+          <button @pointerdown.stop @click="agentOpen = false">✕</button>
         </div>
         <div class="chat"><div v-for="(b,i) in chat" :key="i" class="b" :class="{me: b.me}">{{ b.t }}</div></div>
         <div class="send"><input style="flex:1" v-model="chatIn" @keyup.enter="sendChat"
@@ -454,6 +457,7 @@ Vue.createApp({
       applyRecord: "", applyExpect: "", applyReason: "",
       notifications: [], chat: [], chatIn: "", agentMode: "stub",
       collapsed: false, agentOpen: false,
+      fabPos: {x: 0, y: 0}, winPos: {x: 0, y: 0}, dragDist: 0,
     };
   },
   computed: {
@@ -590,6 +594,40 @@ Vue.createApp({
       if (d.data.pendings && d.data.pendings.length)
         this.chat.push({me: false, t: "★ 已生成待确认项，确认后才会生效（点击待确认项列表中的「确认生效」）。"});
     },
+    fabClick() {
+      if (this.dragDist < 6) {
+        // 聊天窗在悬浮球处展开（右缘对齐球右缘），并整体收进视口
+        this.winPos.x = Math.max(8, Math.min(innerWidth - 388, this.fabPos.x + 64 - 380));
+        this.winPos.y = Math.max(8, Math.min(innerHeight - 508, this.fabPos.y));
+        this.agentOpen = true;
+      }
+      this.dragDist = 0;
+    },
+    dragFab(e) {
+      const sx = e.clientX, sy = e.clientY, ox = this.fabPos.x, oy = this.fabPos.y;
+      const move = ev => {
+        this.dragDist = Math.max(this.dragDist,
+          Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy));
+        this.fabPos.x = Math.max(0, Math.min(innerWidth - 64, ox + ev.clientX - sx));
+        this.fabPos.y = Math.max(0, Math.min(innerHeight - 64, oy + ev.clientY - sy));
+      };
+      const up = () => { removeEventListener("pointermove", move); removeEventListener("pointerup", up); };
+      addEventListener("pointermove", move); addEventListener("pointerup", up);
+    },
+    dragWin(e) {
+      if (e.target.closest("button")) return;   // 点 ✕ 不触发拖拽
+      const sx = e.clientX, sy = e.clientY, ox = this.winPos.x, oy = this.winPos.y;
+      const move = ev => {
+        this.winPos.x = Math.max(0, Math.min(innerWidth - 380, ox + ev.clientX - sx));
+        this.winPos.y = Math.max(0, Math.min(innerHeight - 500, oy + ev.clientY - sy));
+      };
+      const up = () => { removeEventListener("pointermove", move); removeEventListener("pointerup", up); };
+      addEventListener("pointermove", move); addEventListener("pointerup", up);
+    },
+  },
+  mounted() {   // 默认右上角（顶栏下方，右缘 26px）
+    this.fabPos = {x: innerWidth - 90, y: 78};
+    this.winPos = {x: innerWidth - 406, y: 78};
   },
 }).mount("#app");
 </script>
