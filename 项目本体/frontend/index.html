@@ -39,18 +39,23 @@
   .timetable td { height:34px; }
   /* ---- 登录封面（参考左右分栏品牌页布局，纯 CSS 无外部图片） ---- */
   .cover { position:fixed; inset:0; display:flex; overflow:auto;
-           background:linear-gradient(90deg, rgba(244,248,252,.92) 0%, rgba(244,248,252,.72) 42%, rgba(244,248,252,.18) 62%, rgba(244,248,252,0) 78%),
+           background:linear-gradient(90deg, rgba(244,248,252,.42) 0%, rgba(244,248,252,.22) 40%, rgba(244,248,252,0) 60%),
            url("/static/cover_bot.png") 22% center / cover no-repeat, linear-gradient(135deg,#DCEBFA 0%,#BBDCF7 45%,#9CC9F0 100%); }
-  .cover-left { flex:1.4; padding:7vh 6vw; display:flex; flex-direction:column; justify-content:center; }
+  .cover-left { flex:1.4; display:flex; flex-direction:column; justify-content:center;
+           align-self:center; margin:5vh 0 5vh 2vw; padding:4vh 3vw;
+           background:linear-gradient(120deg, rgba(250,252,255,.72), rgba(250,252,255,.34));
+           backdrop-filter:blur(7px); -webkit-backdrop-filter:blur(7px);
+           border:1px solid rgba(255,255,255,.75); border-radius:0 22px 22px 0;
+           box-shadow:0 10px 34px rgba(30,90,160,.16); }
   .cover-brand { display:flex; align-items:center; gap:14px; }
   .cover-logo { width:64px; height:64px; border-radius:16px; background:#fff;
                 display:flex; align-items:center; justify-content:center;
                 box-shadow:0 6px 18px rgba(30,90,160,.25); }
   .cover-logo svg { width:40px; height:40px; }
-  .cover-title { font-size:34px; white-space:nowrap; font-weight:bold; color:#16324F; letter-spacing:2px;
+  .cover-title { font-size:34px; white-space:nowrap; text-shadow:0 1px 6px rgba(255,255,255,.85), 0 0 14px rgba(255,255,255,.6); font-weight:bold; color:#16324F; letter-spacing:2px;
                  font-family:"Microsoft YaHei","SimHei",sans-serif; }
   .cover-title-en { font-size:15px; color:#4A6FA5; letter-spacing:1px; margin-top:4px; }
-  .cover-slogan { margin-top:26px; font-size:26px; color:#12488C; font-weight:bold;
+  .cover-slogan { margin-top:26px; text-shadow:0 1px 4px rgba(255,255,255,.9), 0 0 10px rgba(255,255,255,.6); color:#12488C; font-weight:bold;
                   font-family:"Microsoft YaHei","SimHei",sans-serif; }
   .cover-slogan span { border-bottom:3px solid #1B5AA6; padding-bottom:2px; }
   .cover-feats { margin-top:34px; display:flex; gap:34px; flex-wrap:wrap; }
