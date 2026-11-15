@@ -47,3 +47,11 @@ def teacher_token(client):
     r = client.post("/api/auth/login", json={"login_name": "t01", "password": "t01123"})
     assert r.status_code == 200
     return r.get_json()["data"]["token"]
+
+
+@pytest.fixture()
+def student_token(client):
+    """学生 s0001（seed 约定 s+学号后四位 / s123456）。"""
+    r = client.post("/api/auth/login", json={"login_name": "s0001", "password": "s123456"})
+    assert r.status_code == 200
+    return r.get_json()["data"]["token"]

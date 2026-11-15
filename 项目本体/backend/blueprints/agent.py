@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""M7 PiAgent 智能体：对话、待确认项、确认闭环（详设第 9 章）。仅教务管理员（SRS 2.3(7)）。"""
+"""M7 PiAgent 智能体：对话（三角色，工具按角色差异化）、待确认项、确认闭环（详设第 9 章）。"""
 import json
 
 from flask import Blueprint, request
@@ -19,7 +19,8 @@ def api_agent_chat():
     if err:
         return err
     data = body_json()
-    answer, pendings = m7.handle(data.get("instruction", ""), operator=sess["login_name"])
+    answer, pendings = m7.handle(data.get("instruction", ""), operator=sess["login_name"],
+                                 role=sess["role"], ref_id=sess.get("ref_id"))
     return ok({"answer": answer,
                "mode": "llm" if current_app.config["LLM_API_KEY"] else "stub",
                "pendings": [{"id": p.id, "kind": p.kind, "payload": json.loads(p.payload)}

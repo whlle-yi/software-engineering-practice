@@ -14,12 +14,46 @@ def test_login_and_wrong_password(client):
     assert r.get_json()["message"] == "登录名或口令错误"     # 防枚举：不区分账号/口令
 
 
-def test_rbac_denies_teacher_on_agent(teacher_token, client):
-    """教师调用 PiAgent 必须 403（PiAgent 仅面向教务管理员）。"""
+def test_agent_role_differentiation(teacher_token, student_token, client):
+    """角色差异化（原型阶段口径）：三角色可对话、工具按角色裁剪——
+    教师提交偏好强制绑定本人、待确认项确认权仅管理员、学生只读。"""
+    # 教师：提交本人偏好 → 待确认项的 teacher_id 必须是本人（T01），非参数可伪造
     r = client.post("/api/agent/chat", headers={"X-Auth-Token": teacher_token},
-                    json={"instruction": "现在有多少门课程？"})
+                    json={"instruction": "我周二上午有会，尽量别排我的课"})
+    d = r.get_json()
+    assert r.status_code == 200 and "待确认项" in d["data"]["answer"]
+    with client.application.app_context():
+        from models import Teacher, SysUser, PendingItem
+        t = Teacher.query.filter_by(tno="T001").first()
+        u = SysUser.query.filter_by(login_name="t01").first()
+        assert u.ref_id == t.id
+        item = PendingItem.query.order_by(PendingItem.id.desc()).first()
+        assert item.kind == "preference"
+        import json as _json
+        assert _json.loads(item.payload)["teacher_id"] == t.id
+    # 教师：无法使用约束工具（角色白名单拦截）
+    r = client.post("/api/agent/chat", headers={"X-Auth-Token": teacher_token},
+                    json={"instruction": "查我的课表"})          # 合法：查本人课表
+    assert "课表" in r.get_json()["data"]["answer"]
+    from services.agent import execute_tool, AgentError
+    import pytest
+    with client.application.app_context():
+        with pytest.raises(AgentError):
+            execute_tool("save_constraint", {"key": "avoid_day", "params": "{}", "priority": 4},
+                         operator="t01", role="teacher")
+    # 待确认项列表与确认权仅管理员
+    r = client.get("/api/agent/pending", headers={"X-Auth-Token": teacher_token})
     assert r.status_code == 403
-    assert r.get_json()["code"] == "DENIED"
+    r = client.post("/api/agent/confirm", headers={"X-Auth-Token": teacher_token}, json={"id": 1})
+    assert r.status_code == 403
+    # 学生：只读课表问答；统计类管理工具不可用
+    r = client.post("/api/agent/chat", headers={"X-Auth-Token": student_token},
+                    json={"instruction": "查课表"})
+    d = r.get_json()["data"]
+    assert "课表" in d["answer"] and d["pendings"] == []
+    with client.application.app_context():
+        with pytest.raises(AgentError):
+            execute_tool("query_course_count", {}, operator="s0001", role="student")
 
 
 def test_no_session_401(client):

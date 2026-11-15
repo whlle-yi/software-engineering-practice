@@ -389,8 +389,8 @@
       </main>
     </div>
 
-    <!-- PiAgent 悬浮球与悬浮窗（仅管理员） -->
-    <template v-if="role==='admin'">
+    <!-- PiAgent 悬浮球与悬浮窗（三角色可见，工具按角色差异化） -->
+    <template v-if="role">
       <div class="agent-fab" v-if="!agentOpen" :style="{left: fabPos.x+'px', top: fabPos.y+'px'}"
         @pointerdown="dragFab" @click="fabClick" title="PiAgent 智能助手（可拖动）">
         <svg viewBox="0 0 64 64">
@@ -405,12 +405,12 @@
       </div>
       <div class="agent-win" v-else :style="{left: winPos.x+'px', top: winPos.y+'px'}">
         <div class="aw-head" @pointerdown="dragWin">
-          <span class="t">PiAgent 智能助手（{{ agentMode==='stub' ? '桩模式' : '真实大模型' }}）</span>
+          <span class="t">PiAgent 智能助手·{{ agentRoleLabel }}（{{ agentMode==='stub' ? '桩模式' : '真实大模型' }}）</span>
           <button @pointerdown.stop @click="agentOpen = false">✕</button>
         </div>
         <div class="chat"><div v-for="(b,i) in chat" :key="i" class="b" :class="{me: b.me}">{{ b.t }}</div></div>
         <div class="send"><input style="flex:1" v-model="chatIn" @keyup.enter="sendChat"
-          placeholder="试试：T003 希望尽量安排在周二上午">
+          :placeholder="agentPlaceholder">
           <button @click="sendChat">发送</button></div>
       </div>
     </template>
@@ -465,6 +465,15 @@ Vue.createApp({
     currentNav() {
       return {admin: this.adminNav, teacher: this.teacherNav,
               student: this.studentNav}[this.role] || [];
+    },
+    agentRoleLabel() {   // 三角色智能体能力差异一目了然
+      return {admin: "管理员·约束与偏好编排", teacher: "教师·偏好提交与课表查询",
+              student: "学生·课表问答"}[this.role] || "";
+    },
+    agentPlaceholder() {
+      return {admin: "试试：T003 希望尽量安排在周二上午 或 全局避开周五下午",
+              teacher: "试试：我周二上午有会，尽量别排我的课",
+              student: "试试：查课表"}[this.role] || "";
     },
   },
   methods: {
@@ -591,8 +600,12 @@ Vue.createApp({
       const d = await api("POST", "/api/agent/chat", {instruction: q});
       this.agentMode = d.data.mode;
       this.chat.push({me: false, t: d.data.answer});
-      if (d.data.pendings && d.data.pendings.length)
-        this.chat.push({me: false, t: "★ 已生成待确认项，确认后才会生效（点击待确认项列表中的「确认生效」）。"});
+      if (d.data.pendings && d.data.pendings.length) {
+        const tip = this.role === "admin"
+          ? "★ 已生成待确认项，确认后才会生效（点击待确认项列表中的「确认生效」）。"
+          : "★ 已提交教务管理员，管理员确认后生效，可在「通知」中留意结果。";
+        this.chat.push({me: false, t: tip});
+      }
     },
     fabClick() {
       if (this.dragDist < 6) {

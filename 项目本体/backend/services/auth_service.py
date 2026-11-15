@@ -31,7 +31,9 @@ AUTH_TABLE = {
     ("query", "schedule"): {"admin", "teacher", "student"},
     ("query", "export"): {"admin", "teacher", "student"},
     ("query", "notifications"): {"admin", "teacher", "student"},
-    ("agent", "*"): {"admin"},          # PiAgent 仅面向教务管理员（SRS 2.3(7)）
+    ("agent", "chat"): {"admin", "teacher", "student"},  # PiAgent 三角色可用，工具按角色差异化（服务层二次校验）
+    ("agent", "pending"): {"admin"},
+    ("agent", "confirm"): {"admin"},
     ("audit", "list"): {"admin"},
 }
 
