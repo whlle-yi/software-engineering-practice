@@ -84,9 +84,10 @@ def _seed(s):
             st = Student(sno=sno, name=random.choice(surnames) + given[random.randint(0, 19)],
                          class_id=c.id)
             s.add(st)
+            s.flush()        # 取 st.id 供学生账号 ref_id 引用
             if j <= 3:  # 每班 3 个学生账号用于演示
                 s.add(SysUser(login_name="s" + sno[-4:], password_hash=hash_password("s123456"),
-                              role="student", ref_id=None))
+                              role="student", ref_id=st.id))
     s.flush()
 
     # ---- 课程 20 门 ----

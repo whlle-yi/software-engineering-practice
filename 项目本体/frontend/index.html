@@ -52,22 +52,26 @@
                  font-family:"Microsoft YaHei","SimHei",sans-serif; }
   .cover-title-en { font-size:15px; text-shadow:0 1px 4px rgba(255,255,255,.95), 0 0 10px rgba(255,255,255,.75); color:#4A6FA5; letter-spacing:1px; margin-top:4px; }
   .cover-right { position:absolute; right:4vw; top:50%; transform:translateY(-50%); }
-  .glass { width:100%; max-width:400px; background:rgba(255,255,255,.72);
+  .glass { width:440px; height:440px; background:rgba(255,255,255,.72);
            backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
            border:1px solid rgba(255,255,255,.8); border-radius:18px;
-           padding:36px 34px; box-shadow:0 12px 40px rgba(30,90,160,.28); }
+           padding:46px 44px; box-shadow:0 12px 40px rgba(30,90,160,.28);
+           display:flex; flex-direction:column; }
   .glass h3 { font-size:22px; color:#16324F; font-family:"Microsoft YaHei",sans-serif;
               border-bottom:3px solid var(--pri); display:inline-block; padding-bottom:6px; }
-  .glass .fld { margin-top:22px; position:relative; }
-  .glass input { width:100%; padding:11px 14px 11px 40px; border:1px solid #C9D8EA;
+  .glass .fld { margin-top:30px; position:relative; }
+  .glass input { width:100%; padding:13px 14px 13px 42px; border:1px solid #C9D8EA;
                  border-radius:10px; font-size:14px; background:rgba(255,255,255,.85); }
   .glass input:focus { outline:2px solid var(--pri); border-color:var(--pri); }
   .glass .fld .pi { position:absolute; left:12px; top:50%; transform:translateY(-50%);
                     width:18px; height:18px; opacity:.55; }
-  .glass button { width:100%; margin-top:26px; padding:12px; font-size:16px;
+  .glass > button { width:100%; margin-top:36px; padding:14px; font-size:17px;
                   border-radius:10px; background:var(--pri); }
   .glass button:hover { filter:brightness(1.08); }
-  .glass .hint { font-size:12px; color:#5B7CA8; margin-top:14px; line-height:1.7; }
+  .glass .demo-row { display:flex; gap:12px; margin-top:auto; }
+  .glass .demo-btn { flex:1; background:#EDF1F7; color:var(--pri); border:1px solid #C9D8EA;
+                     font-size:13px; padding:11px 6px; border-radius:8px; }
+  .glass .demo-btn:hover { background:var(--pri); color:#fff; }
   @media (max-width:860px) { .cover { flex-direction:column; } .cover-left { padding:6vh 8vw 2vh; }
     .cover-title { font-size:30px; white-space:normal; }
     .cover-right { padding:2vh 8vw 8vh; } }
@@ -102,7 +106,11 @@
         </div>
         <button @click="doLogin">登 录</button>
         <div class="msg err" v-if="msg">{{ msg }}</div>
-        <div class="hint">演示账号：admin / admin123（教务管理员）｜ t01~t30 / tXX123（教师）｜ 学生账号见通知页。登录即代表同意按模拟数据使用本系统。</div>
+        <div class="demo-row">
+          <button class="demo-btn" @click="quickLogin('admin','admin123')">管理员</button>
+          <button class="demo-btn" @click="quickLogin('t01','t01123')">教师</button>
+          <button class="demo-btn" @click="quickLogin('s0001','s123456')">学生</button>
+        </div>
       </div>
     </div>
   </div>
@@ -304,6 +312,9 @@ Vue.createApp({
                        this.role==="teacher" ? this.tab==="home" : true; },
   },
   methods: {
+    quickLogin(name, pwd) {
+      this.loginName = name; this.password = pwd;   // 只填账号密码，登录仍点「登 录」
+    },
     async doLogin() {
       const d = await api("POST", "/api/auth/login", {login_name: this.loginPass ? this.loginName : this.loginName, password: this.password});
       if (d.code !== 0) { this.msg = d.message; return; }

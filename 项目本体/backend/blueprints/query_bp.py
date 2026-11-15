@@ -17,14 +17,20 @@ def api_query_schedule():
     view_type = request.args.get("view", "teacher")
     ref = request.args.get("ref", "")
     if sess["role"] == "teacher":
-        view_type, ref = "teacher", sess["ref_id"]
+        rows, err2 = m6.view("teacher", sess["ref_id"], term_id())
+        if err2:
+            return fail("NOT_FOUND", err2, 404)
+        return ok({"view": "teacher", "rows": rows})
     elif sess["role"] == "student":
-        rows, err2 = m6.view("student", ref, term_id(),
-                             student_sno=request.args.get("sno", ""))
+        from models import Student
+        st = Student.query.get(sess["ref_id"])
+        if st is None:
+            return fail("NOT_FOUND", "学生身份缺失", 404)
+        rows, err2 = m6.view("student", ref, term_id(), student_sno=st.sno)
         if err2:
             return fail("NOT_FOUND", err2, 404)
         return ok({"view": "student", "rows": rows})
-    rows, err2 = m6.view(view_type, int(ref) if ref and ref.isdigit() else None,
+    rows, err2 = m6.view(view_type, int(ref) if str(ref).isdigit() else None,
                          term_id(), student_sno=request.args.get("sno"))
     if err2:
         return fail("NOT_FOUND", err2, 404)
