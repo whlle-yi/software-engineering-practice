@@ -19,7 +19,7 @@ def api_engine_solve():
     return ok(result)
 
 
-@bp.post("/report")
+@bp.route("/report", methods=["GET", "POST"])
 def api_engine_report():
     _, err = need_auth("engine", "report")
     if err:

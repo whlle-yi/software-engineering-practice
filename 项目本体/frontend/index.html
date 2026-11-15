@@ -5,43 +5,85 @@
 <title>PiAgent 赋能的高校排课系统 · 原型</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-  :root { --pri:#4E79A7; --acc:#F28E2B; --bg:#F4F6F9; --line:#D9D9D9; }
+  :root { --pri:#3E6B9E; --pri-deep:#2C527C; --acc:#E8952F; --bg:#EEF2F7;
+          --line:#D5DEE9; --text:#22334A; }
   * { box-sizing:border-box; margin:0; }
-  body { font-family:"Times New Roman","SimSun",serif; background:var(--bg); color:#1A1A1A; }
-  header { background:var(--pri); color:#fff; padding:12px 24px; display:flex; justify-content:space-between; align-items:center; }
-  header h1 { font-size:18px; font-weight:bold; }
+  body { font-family:"Microsoft YaHei","SimHei",sans-serif; background:var(--bg);
+         color:var(--text); font-size:15px; }
+  header { background:var(--pri-deep); color:#fff; padding:14px 28px;
+           display:flex; justify-content:space-between; align-items:center; }
+  header h1 { font-size:19px; font-weight:bold; }
   header .who { font-size:14px; }
-  main { max-width:1180px; margin:16px auto; padding:0 16px; }
-  .card { background:#fff; border:1px solid var(--line); border-radius:6px; padding:16px; margin-bottom:14px; }
-  .card h3 { font-size:15px; margin-bottom:10px; color:var(--pri); }
-  table { width:100%; border-collapse:collapse; font-size:13px; }
-  th,td { border:1px solid var(--line); padding:6px 8px; text-align:center; }
-  th { background:#EDF1F7; }
-  button { background:var(--pri); color:#fff; border:none; border-radius:4px; padding:6px 14px; cursor:pointer; font-size:13px; }
+  header .who button { margin-left:14px; background:rgba(255,255,255,.15); font-size:13px; }
+  /* ---- 左侧步骤导航 + 内容区 ---- */
+  .shell { display:flex; min-height:calc(100vh - 55px); }
+  aside { width:250px; background:var(--pri-deep); color:#fff; padding:16px 0; flex-shrink:0; }
+  aside .nav-item { padding:15px 20px 15px 16px; cursor:pointer; display:flex;
+                    gap:12px; align-items:center; border-left:4px solid transparent; }
+  aside .nav-item:hover { background:rgba(255,255,255,.08); }
+  aside .nav-item.on { background:rgba(255,255,255,.16); border-left-color:var(--acc); }
+  aside .nav-item .no { font-size:19px; font-weight:bold; opacity:.9; width:26px;
+                        text-align:center; flex-shrink:0; }
+  aside .nav-item .nm { font-size:15px; line-height:1.3; }
+  aside .nav-item .ds { font-size:12px; opacity:.72; display:block; margin-top:2px; }
+  .content { flex:1; padding:26px 36px; max-width:1080px; }
+  .page-head { margin-bottom:20px; }
+  .page-head .tag { background:var(--acc); color:#fff; font-size:13px; padding:4px 12px;
+                    border-radius:4px; font-weight:bold; display:inline-block; }
+  .page-head h2 { font-size:26px; margin:10px 0 8px; color:var(--pri-deep);
+                  font-family:"Microsoft YaHei",sans-serif; }
+  .page-head .sub { font-size:15px; color:#5A6B82; line-height:1.8; }
+  .card { background:#fff; border-radius:10px; padding:24px 28px; margin-bottom:20px;
+          box-shadow:0 2px 10px rgba(40,70,110,.08); }
+  .card h3 { font-size:17px; margin-bottom:16px; color:var(--pri-deep);
+             padding-left:10px; border-left:4px solid var(--acc);
+             font-family:"Microsoft YaHei",sans-serif; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th,td { border:1px solid var(--line); padding:10px 12px; text-align:center; }
+  th { background:#EDF1F7; color:var(--pri-deep); }
+  button { background:var(--pri); color:#fff; border:none; border-radius:6px;
+           padding:9px 20px; cursor:pointer; font-size:15px;
+           font-family:"Microsoft YaHei",sans-serif; }
+  button:hover { filter:brightness(1.1); }
+  button.big { font-size:17px; padding:15px 46px; font-weight:bold; }
   button.warn { background:var(--acc); }
+  button.ghost { background:#fff; color:var(--pri); border:1.5px solid var(--pri); }
   button:disabled { opacity:.5; cursor:not-allowed; }
-  input,select,textarea { padding:6px; border:1px solid var(--line); border-radius:4px; font-size:13px; }
-  .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
-  .tabs { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
-  .tabs button { background:#fff; color:var(--pri); border:1px solid var(--pri); }
-  .tabs button.on { background:var(--pri); color:#fff; }
-  .msg { padding:8px 12px; border-radius:4px; margin-bottom:8px; font-size:13px; }
+  input,select,textarea { padding:10px 12px; border:1px solid #C3CFDD; border-radius:6px;
+                          font-size:15px; font-family:"Microsoft YaHei",sans-serif; }
+  label.fld-label { font-size:14px; color:var(--pri-deep); font-weight:bold;
+                    display:block; margin:14px 0 6px; }
+  .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:6px; }
+  .msg { padding:12px 16px; border-radius:6px; margin-bottom:10px; font-size:15px; }
   .msg.ok { background:#E6F2E6; color:#2E7D32; }
   .msg.err { background:#FDECEA; color:#C62828; }
-  .msg.info { background:#EDF1F7; color:var(--pri); }
-  .chat { max-height:340px; overflow-y:auto; border:1px solid var(--line); padding:10px; margin-bottom:8px; }
-  .chat .b { margin-bottom:8px; font-size:13px; line-height:1.6; }
-  .chat .b.me { text-align:right; color:var(--pri); }
-  .stat { display:flex; gap:14px; margin-bottom:8px; flex-wrap:wrap; }
-  .stat div { background:#EDF1F7; border-radius:6px; padding:10px 18px; text-align:center; }
-  .stat b { font-size:22px; color:var(--pri); display:block; }
-  .stat span { font-size:12px; color:#666; }
-  .timetable td { height:34px; }
+  .msg.info { background:#EDF1F7; color:var(--pri-deep); }
+  .stat-grid { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:6px; }
+  .stat-grid div { background:#EDF1F7; border-radius:10px; padding:18px 26px;
+                   text-align:center; min-width:120px; }
+  .stat-grid b { font-size:30px; color:var(--pri-deep); display:block;
+                 font-family:"Microsoft YaHei",sans-serif; }
+  .stat-grid span { font-size:13px; color:#5A6B82; }
+  .step-cards { display:flex; gap:16px; flex-wrap:wrap; margin-top:6px; }
+  .step-card { flex:1; min-width:200px; background:#fff; border:2px solid var(--line);
+               border-radius:10px; padding:20px; cursor:pointer; text-align:left; }
+  .step-card:hover { border-color:var(--acc); box-shadow:0 4px 16px rgba(40,70,110,.14); }
+  .step-card .no { color:var(--acc); font-size:24px; font-weight:bold;
+                   font-family:"Microsoft YaHei",sans-serif; }
+  .step-card .nm { font-size:17px; font-weight:bold; color:var(--pri-deep); margin:6px 0 4px; }
+  .step-card .ds { font-size:13px; color:#5A6B82; line-height:1.6; }
+  .timetable td { height:40px; }
+  .timetable small { color:#5A6B82; }
+  .chat { max-height:380px; overflow-y:auto; border:1px solid var(--line);
+          padding:14px; margin-bottom:10px; border-radius:6px; }
+  .chat .b { margin-bottom:10px; font-size:15px; line-height:1.7; }
+  .chat .b.me { text-align:right; color:var(--pri-deep); }
+  /* ---- 登录封面 ---- */
   /* ---- 登录封面（参考左右分栏品牌页布局，纯 CSS 无外部图片） ---- */
   .cover { position:fixed; inset:0; display:grid; overflow:auto; grid-template-columns:1.25fr 1fr; grid-template-rows:100%;
            background:linear-gradient(90deg, rgba(244,248,252,.42) 0%, rgba(244,248,252,.22) 40%, rgba(244,248,252,0) 60%),
            url("/static/cover_bot.png") 22% center / cover no-repeat, linear-gradient(135deg,#DCEBFA 0%,#BBDCF7 45%,#9CC9F0 100%); }
-  .cover-left { flex:1.2; display:flex; flex-direction:column; justify-content:center;
+  .cover-left { display:flex; flex-direction:column; justify-content:center;
            align-items:flex-start; padding:0 2vw 9vh 5vw; }
   .cover-brand { display:flex; align-items:center; gap:14px; }
   .cover-logo { width:64px; height:64px; border-radius:16px; background:#fff;
@@ -72,7 +114,9 @@
   .glass .demo-btn { flex:1; background:#EDF1F7; color:var(--pri); border:1px solid #C9D8EA;
                      font-size:13px; padding:11px 6px; border-radius:8px; }
   .glass .demo-btn:hover { background:var(--pri); color:#fff; }
-  @media (max-width:860px) { .cover { flex-direction:column; } .cover-left { padding:6vh 8vw 2vh; }
+  .glass .msg { margin-top:16px; }
+  @media (max-width:860px) { .cover { grid-template-columns:1fr; grid-template-rows:auto auto; }
+    .cover-left { padding:6vh 8vw 2vh; }
     .cover-title { font-size:30px; white-space:normal; }
     .cover-right { padding:2vh 8vw 8vh; } }
 </style>
@@ -121,158 +165,314 @@
       <div class="who">{{ loginName }}（{{ roleCN }}）
         <button @click="doLogout" style="margin-left:12px">退出</button></div>
     </header>
-    <main>
+    <div class="shell">
+      <aside v-if="role==='admin'">
+        <div v-for="n in adminNav" :key="n.k" class="nav-item" :class="{on: tab===n.k}" @click="tab=n.k">
+          <div class="no">{{ n.no }}</div>
+          <div><span class="nm">{{ n.nm }}</span><span class="ds">{{ n.ds }}</span></div>
+        </div>
+      </aside>
+      <aside v-else-if="role==='teacher'">
+        <div v-for="n in teacherNav" :key="n.k" class="nav-item" :class="{on: tab===n.k}" @click="tab=n.k">
+          <div class="no">{{ n.no }}</div>
+          <div><span class="nm">{{ n.nm }}</span><span class="ds">{{ n.ds }}</span></div>
+        </div>
+      </aside>
+      <aside v-else>
+        <div v-for="n in studentNav" :key="n.k" class="nav-item" :class="{on: tab===n.k}" @click="tab=n.k">
+          <div class="no">{{ n.no }}</div>
+          <div><span class="nm">{{ n.nm }}</span><span class="ds">{{ n.ds }}</span></div>
+        </div>
+      </aside>
+      <main class="content">
       <div class="msg" :class="flashType" v-if="flash">{{ flash }}</div>
 
-      <div class="tabs" v-if="role==='admin'">
-        <button v-for="t in adminTabs" :key="t.k" :class="{on: tab===t.k}" @click="tab=t.k">{{ t.n }}</button>
-      </div>
-      <div class="tabs" v-if="role==='teacher'">
-        <button v-for="t in teacherTabs" :key="t.k" :class="{on: tab===t.k}" @click="tab=t.k">{{ t.n }}</button>
-      </div>
-
-      <!-- 管理员：概览 -->
-      <div v-if="role==='admin' && tab==='home'">
-        <div class="card"><h3>概览</h3>
-          <div class="stat">
+      <!-- ===== 管理员 · 总览 ===== -->
+      <div v-if="role==='admin' && tab==='overview'">
+        <div class="card">
+          <h3>本学期数据一览</h3>
+          <div class="stat-grid">
             <div><b>{{ stats.teachers }}</b><span>教师</span></div>
             <div><b>{{ stats.courses }}</b><span>课程</span></div>
             <div><b>{{ stats.classes }}</b><span>班级</span></div>
             <div><b>{{ stats.tasks }}</b><span>开课任务</span></div>
-            <div><b>{{ stats.records }}</b><span>课表记录</span></div>
-            <div><b style="color:var(--acc)">{{ stats.conflicts }}</b><span>硬冲突</span></div>
+            <div><b>{{ stats.records }}</b><span>已排课表</span></div>
+            <div><b :style="{color: stats.conflicts === 0 ? 'var(--ok, #2E7D32)' : 'var(--acc)'}">{{ stats.conflicts }}</b><span>硬冲突</span></div>
           </div>
-          <button @click="solve" :disabled="solving">{{ solving ? '求解中…' : '运行排课引擎（全量求解）' }}</button>
-          <div class="msg info" v-if="solveReport" style="margin-top:8px">求解报告：{{ solveReport }}</div>
+          <p style="font-size:15px; line-height:2; margin-top:10px">
+            左侧菜单按<b>排课业务流程</b>排列：先在「① 导入数据」中导入教学计划，再到「② 配置约束」
+            设置排课规则与教师偏好，然后点「③ 自动排课」一键生成课表；学期中的调课申请在
+            「④ 调课审核」处理。</p>
+          <div class="step-cards">
+            <div class="step-card" @click="tab='import'">
+              <div class="no">①</div><div class="nm">导入数据</div>
+              <div class="ds">下载模板、导入教学计划与基础数据</div></div>
+            <div class="step-card" @click="tab='constraint'">
+              <div class="no">②</div><div class="nm">配置约束</div>
+              <div class="ds">设置排课规则、确认教师偏好</div></div>
+            <div class="step-card" @click="tab='engine'">
+              <div class="no">③</div><div class="nm">自动排课</div>
+              <div class="ds">一键求解、检查冲突、查看课表</div></div>
+            <div class="step-card" @click="tab='adjust'">
+              <div class="no">④</div><div class="nm">调课审核</div>
+              <div class="ds">处理学期中的调课申请</div></div>
+          </div>
         </div>
-        <div class="card"><h3>导入教学计划（Excel/CSV，整文件校验+单事务）</h3>
+        <div class="card">
+          <h3>快捷入口</h3>
+          <div class="row">
+            <button @click="tab='engine'">开始自动排课</button>
+            <button class="ghost" @click="tab='agent'">和 PiAgent 聊一聊</button>
+            <button class="ghost" @click="tab='audit'">查看操作日志</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 管理员 · 第 1 步 导入数据 ===== -->
+      <div v-if="role==='admin' && tab==='import'">
+        <div class="page-head">
+          <span class="tag">第 1 步</span>
+          <h2>导入教学计划</h2>
+          <p class="sub">从教务系统导出教学计划 Excel，按模板整理后在这里一次性导入本学期的开课任务。
+          导入时系统会逐行校验，有问题的行会整行拒绝并告诉你第几行、什么原因。</p>
+        </div>
+        <div class="card">
+          <h3>上传教学计划文件</h3>
+          <label class="fld-label">第 1 步：下载模板，按模板填写课程、班级、教师信息</label>
+          <button class="ghost" @click="downloadTemplate">下载模板 CSV</button>
+          <label class="fld-label">第 2 步：选择填好的文件，选择学期，点击导入</label>
           <div class="row">
             <input type="file" @change="pickFile">
             <select v-model="importTerm"><option>2026-2027-1</option><option>2026-2027-2</option></select>
-            <button @click="doImport" :disabled="!file">导入</button>
-            <a href="javascript:void(0)" @click="downloadTemplate">下载模板 CSV</a>
+            <button class="big" @click="doImport" :disabled="!file">导入</button>
           </div>
           <div class="msg err" v-if="importErrors.length">
             <div v-for="e in importErrors">{{ e }}</div>
           </div>
         </div>
-        <div class="card"><h3>审计日志（最近 100 条）</h3>
+        <div class="card">
+          <h3>已导入的基础数据</h3>
+          <label class="fld-label">开课任务（{{ tasks.length }} 条）</label>
+          <table>
+            <tr><th>课程</th><th>教师</th><th>班级</th><th>周次</th></tr>
+            <tr v-for="t in tasks"><td>{{ t.course }}</td><td>{{ t.teacher }}</td><td>{{ t["class"] }}</td><td>{{ t.weeks }}</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== 管理员 · 第 2 步 配置约束 ===== -->
+      <div v-if="role==='admin' && tab==='constraint'">
+        <div class="page-head">
+          <span class="tag">第 2 步</span>
+          <h2>配置排课约束</h2>
+          <p class="sub">告诉系统「哪些规则必须遵守、哪些情况尽量满足」。全局硬约束已内置；
+          教师的个人偏好可由 PiAgent 从对话中提取，您确认后启用。</p>
+        </div>
+        <div class="card">
+          <h3>新增一条软约束</h3>
+          <label class="fld-label">约束类型</label>
+          <div class="row">
+            <select v-model="newC.key">
+              <option value="prefer_day">期望某天上课（软）</option>
+              <option value="avoid_day">回避某天上课（软）</option>
+              <option value="max_daily">每日节次上限（软）</option>
+            </select>
+            <select v-model="newC.day"><option>周一</option><option>周二</option><option>周三</option><option>周四</option><option>周五</option></select>
+            <button @click="addConstraint">保存约束</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>约束清单</h3>
+          <table><tr><th>类型</th><th>参数</th><th>优先级</th><th>状态</th><th>操作</th></tr>
+            <tr v-for="c in constraints"><td>{{ c.key }}</td><td>{{ c.params }}</td><td>{{ c.priority }}</td><td>{{ c.enabled ? '启用' : '停用' }}</td><td><button @click="toggleC(c)">{{ c.enabled ? '停用' : '启用' }}</button></td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3>教师偏好（确认后才会参与排课）</h3>
+          <p style="font-size:14px; color:#5A6B82; margin-bottom:10px">
+            教师通过 PiAgent 说出的偏好会先变成「草稿」，您在这里逐条启用；未启用的偏好不参与排课。</p>
+          <table><tr><th>教师</th><th>类型</th><th>内容</th><th>状态</th><th>操作</th></tr>
+            <tr v-for="p in preferences"><td>{{ p.teacher_id }}</td><td>{{ p.ptype }}</td><td>{{ p.content }}</td><td>{{ p.status }}</td><td>
+              <button v-if="p.status==='草稿'" @click="prefStatus(p,'已启用')">启用</button>
+              <button v-if="p.status==='已启用'" class="warn" @click="prefStatus(p,'已停用')">停用</button>
+            </td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3>PiAgent 待确认项</h3>
+          <table><tr><th>类型</th><th>内容</th><th>操作</th></tr>
+            <tr v-for="p in pendings"><td>{{ p.kind }}</td><td>{{ p.payload.desc }}</td><td><button @click="confirmPending(p)">确认生效</button></td></tr>
+            <tr v-if="!pendings.length"><td colspan="3">暂无待确认项</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== 管理员 · 第 3 步 自动排课 ===== -->
+      <div v-if="role==='admin' && tab==='engine'">
+        <div class="page-head">
+          <span class="tag">第 3 步</span>
+          <h2>自动排课</h2>
+          <p class="sub">点击下方按钮，系统会自动完成排课并检查冲突——正常情况下院系规模（百门课以内）
+          一分钟内完成，生成课表保证硬冲突为零。排好后可在下方课表预览核对。</p>
+        </div>
+        <div class="card" style="text-align:center; padding:34px">
+          <button class="big" @click="solve" :disabled="solving">
+            {{ solving ? '正在自动排课，请稍候…' : '开始自动排课' }}</button>
+          <div class="msg ok" v-if="solveReport" style="margin-top:16px; font-size:16px">{{ solveReport }}</div>
+        </div>
+        <div class="card">
+          <h3>课表预览与导出</h3>
+          <div class="row">
+            <select v-model="ttQuery.view">
+              <option value="class">按班级</option><option value="teacher">按教师</option><option value="room">按教室</option>
+            </select>
+            <select v-model="ttQuery.ref">
+              <option v-if="ttQuery.view==='class'" v-for="c in classes" :value="c.id">{{ c.name }}</option>
+              <option v-if="ttQuery.view==='teacher'" v-for="t in teachers" :value="t.id">{{ t.name }}</option>
+              <option v-if="ttQuery.view==='room'" v-for="r in rooms" :value="r.id">{{ r.rno }}</option>
+            </select>
+            <button @click="loadTT('admin')">查询课表</button>
+            <a :href="exportUrl('csv')">导出 CSV</a><a :href="exportUrl('xlsx')">导出 Excel</a>
+          </div>
+          <table class="timetable">
+            <tr><th>节次</th><th>周一</th><th>周二</th><th>周三</th><th>周四</th><th>周五</th></tr>
+            <tr v-for="p in 4"><td>第 {{ p }} 节</td>
+              <td v-for="d in 5">
+                <div v-for="r in cellFor(d, p)" :key="r.record_id">
+                  {{ r.course }}<br><small>{{ r.teacher }} @{{ r.room }}</small>
+                </div>
+              </td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== 管理员 · 第 4 步 调课审核 ===== -->
+      <div v-if="role==='admin' && tab==='adjust'">
+        <div class="page-head">
+          <span class="tag">第 4 步</span>
+          <h2>调课审核</h2>
+          <p class="sub">教师提交的调课申请会出现在这里。点「通过」后系统自动为该课程重新安排时间教室并通知相关师生；
+          若时间冲突无法安排，申请会保持待审核状态并提示您调整。</p>
+        </div>
+        <div class="card">
+          <table><tr><th>申请</th><th>原安排</th><th>期望</th><th>原因</th><th>状态</th><th>操作</th></tr>
+            <tr v-for="r in adjusts"><td>#{{ r.id }}</td><td>{{ r.original }}</td><td>{{ r.expectation }}</td><td>{{ r.reason }}</td>
+              <td>{{ r.status }}<div v-if="r.review_comment" style="font-size:13px;color:#666">{{ r.review_comment }}</div></td>
+              <td v-if="r.status==='待审核'"><button @click="review(r,'通过')">通过</button> <button class="warn" @click="review(r,'退回')">退回</button></td>
+              <td v-else>—</td></tr>
+            <tr v-if="!adjusts.length"><td colspan="6">暂无调课申请</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== 管理员 · PiAgent 对话 ===== -->
+      <div v-if="role==='admin' && tab==='agent'">
+        <div class="page-head">
+          <span class="tag">智能助手</span>
+          <h2>PiAgent 智能助手</h2>
+          <p class="sub">用自然语言问课、查统计、替教师登记偏好。写操作（如保存偏好）会生成待确认项，
+          您确认后才生效。</p>
+        </div>
+        <div class="card">
+          <div class="chat"><div v-for="(b,i) in chat" :key="i" class="b" :class="{me: b.me}">{{ b.t }}</div></div>
+          <div class="row"><input style="flex:1" v-model="chatIn" @keyup.enter="sendChat"
+            placeholder="试试：T003 希望尽量安排在周二上午 / 现在有多少门课程？">
+            <button @click="sendChat">发送</button></div>
+        </div>
+      </div>
+
+      <!-- ===== 管理员 · 系统日志 ===== -->
+      <div v-if="role==='admin' && tab==='audit'">
+        <div class="page-head">
+          <span class="tag">系统日志</span>
+          <h2>操作留痕</h2>
+          <p class="sub">全部写操作自动留痕，用于追溯与安全审计（最近 100 条）。</p>
+        </div>
+        <div class="card">
           <table><tr><th>时间</th><th>操作者</th><th>动作</th><th>对象</th><th>详情</th></tr>
             <tr v-for="a in audits"><td>{{ a.created_at }}</td><td>{{ a.operator }}</td><td>{{ a.action }}</td><td>{{ a.target }}</td><td>{{ a.detail }}</td></tr>
           </table>
         </div>
       </div>
 
-      <!-- 管理员：约束与偏好 -->
-      <div v-if="role==='admin' && tab==='constraint'">
-        <div class="card"><h3>排课约束（全局硬约束 / 管理员软约束）</h3>
+      <!-- ===== 教师 · 我的课表 ===== -->
+      <div v-if="role==='teacher' && tab==='tt'">
+        <div class="page-head">
+          <h2>我的课表</h2>
+          <p class="sub">本人本学期的课表，可导出。如需调整某节课，到「调课申请」提交申请。</p>
+        </div>
+        <div class="card">
           <div class="row">
-            <select v-model="newC.key">
-              <option value="avoid_day">回避星期（软）</option>
-              <option value="prefer_day">期望星期（软）</option>
-              <option value="max_daily">每日节次上限（软）</option>
-            </select>
-            <select v-model="newC.day"><option>周一</option><option>周二</option><option>周三</option><option>周四</option><option>周五</option></select>
-            <button @click="addConstraint">新增</button>
+            <button @click="loadTT('teacher')">刷新我的课表</button>
+            <a :href="exportUrl('csv')">导出 CSV</a>
           </div>
-          <table><tr><th>#</th><th>类型</th><th>参数</th><th>优先级</th><th>启用</th><th>操作</th></tr>
-            <tr v-for="c in constraints"><td>{{ c.id }}</td><td>{{ c.key }}</td><td>{{ c.params }}</td><td>{{ c.priority }}</td><td>{{ c.enabled ? '启用' : '停用' }}</td><td><button @click="toggleC(c)">{{ c.enabled ? '停用' : '启用' }}</button></td></tr>
-          </table>
-        </div>
-        <div class="card"><h3>教师偏好（PiAgent 提取后经确认保存；启用后参与排课）</h3>
-          <table><tr><th>#</th><th>教师</th><th>类型</th><th>内容</th><th>状态</th><th>操作</th></tr>
-            <tr v-for="p in preferences"><td>{{ p.id }}</td><td>{{ p.teacher_id }}</td><td>{{ p.ptype }}</td><td>{{ p.content }}</td><td>{{ p.status }}</td><td>
-              <button v-if="p.status==='草稿'" @click="prefStatus(p,'已启用')">启用</button>
-              <button v-if="p.status==='已启用'" class="warn" @click="prefStatus(p,'已停用')">停用</button>
-            </td></tr>
-          </table>
-        </div>
-        <div class="card"><h3>PiAgent 待确认项</h3>
-          <table><tr><th>#</th><th>类型</th><th>内容</th><th>操作</th></tr>
-            <tr v-for="p in pendings"><td>{{ p.id }}</td><td>{{ p.kind }}</td><td>{{ p.payload.desc }}</td><td><button @click="confirmPending(p)">确认生效</button></td></tr>
-            <tr v-if="!pendings.length"><td colspan="4">暂无待确认项</td></tr>
+          <table class="timetable">
+            <tr><th>节次</th><th>周一</th><th>周二</th><th>周三</th><th>周四</th><th>周五</th></tr>
+            <tr v-for="p in 4"><td>第 {{ p }} 节</td>
+              <td v-for="d in 5">
+                <div v-for="r in cellFor(d, p)" :key="r.record_id">
+                  {{ r.course }}<br><small>{{ r.room }}</small>
+                </div>
+              </td></tr>
           </table>
         </div>
       </div>
 
-      <!-- 管理员：调课审核 -->
-      <div v-if="role==='admin' && tab==='adjust'">
-        <div class="card"><h3>调课审核（通过与局部重排同事务；重排不可行保持待审核）</h3>
-          <table><tr><th>#</th><th>原安排</th><th>期望</th><th>原因</th><th>状态</th><th>操作</th></tr>
-            <tr v-for="r in adjusts"><td>{{ r.id }}</td><td>{{ r.original }}</td><td>{{ r.expectation }}</td><td>{{ r.reason }}</td>
-              <td>{{ r.status }}<div v-if="r.review_comment" style="font-size:11px;color:#666">{{ r.review_comment }}</div></td>
-              <td v-if="r.status==='待审核'"><button @click="review(r,'通过')">通过</button> <button class="warn" @click="review(r,'退回')">退回</button></td>
-              <td v-else>—</td></tr>
-          </table>
-        </div>
-      </div>
-
-      <!-- 管理员：PiAgent 对话 -->
-      <div v-if="role==='admin' && tab==='agent'">
-        <div class="card"><h3>PiAgent 智能助手（{{ agentMode==='stub' ? '桩模式' : '真实大模型' }}）</h3>
-          <div class="chat"><div v-for="(b,i) in chat" :key="i" class="b" :class="{me: b.me}">{{ b.t }}</div></div>
-          <div class="row"><input style="flex:1" v-model="chatIn" @keyup.enter="sendChat" placeholder="试试：T003 希望尽量安排在周二上午 / 现在有多少门课程？">
-            <button @click="sendChat">发送</button></div>
-          <p style="font-size:12px;color:#666">写操作（偏好/约束）将生成待确认项，经「约束与偏好」页确认后生效。</p>
-        </div>
-      </div>
-
-      <!-- 课表（管理员/教师/学生共用） -->
-      <div v-if="showTimetable" class="card">
-        <h3>课表（{{ ttView }}）</h3>
-        <div class="row" v-if="role==='admin'">
-          <select v-model="ttQuery.view">
-            <option value="class">按班级</option><option value="teacher">按教师</option><option value="room">按教室</option>
-          </select>
-          <select v-model="ttQuery.ref">
-            <option v-if="ttQuery.view==='class'" v-for="c in classes" :value="c.id">{{ c.name }}</option>
-            <option v-if="ttQuery.view==='teacher'" v-for="t in teachers" :value="t.id">{{ t.name }}</option>
-            <option v-if="ttQuery.view==='room'" v-for="r in rooms" :value="r.id">{{ r.rno }}</option>
-          </select>
-          <button @click="loadTT('admin')">查询</button>
-          <a :href="exportUrl('csv')">导出 CSV</a><a :href="exportUrl('xlsx')">导出 Excel</a>
-        </div>
-        <div class="row" v-if="role==='teacher'">
-          <button @click="loadTT('teacher')">刷新我的课表</button>
-          <a :href="exportUrl('csv')">导出 CSV</a>
-        </div>
-        <table class="timetable">
-          <tr><th>节次</th><th>周一</th><th>周二</th><th>周三</th><th>周四</th><th>周五</th></tr>
-          <tr v-for="p in 4"><td>第 {{ p }} 节</td>
-            <td v-for="d in 5">
-              <div v-for="r in cellFor(d, p)" :key="r.record_id">
-                {{ r.course }}<br><small>{{ r.teacher }} @{{ r.room }}</small>
-              </div>
-            </td></tr>
-        </table>
-      </div>
-
-      <!-- 教师：调课申请 -->
+      <!-- ===== 教师 · 调课申请 ===== -->
       <div v-if="role==='teacher' && tab==='apply'">
-        <div class="card"><h3>发起调课申请（对本人课表的记录）</h3>
+        <div class="page-head">
+          <h2>调课申请</h2>
+          <p class="sub">选择要调的课，填写期望时间和原因，提交后等待教务管理员审核。</p>
+        </div>
+        <div class="card">
+          <h3>发起新申请</h3>
+          <label class="fld-label">要调整的课</label>
           <div class="row">
-            <select v-model="applyRecord"><option value="">选择我的课表记录</option>
+            <select style="flex:1" v-model="applyRecord"><option value="">选择我的课表记录</option>
               <option v-for="r in ttRows" :value="r.record_id">周{{ r.day }} 第{{ r.period }}节 {{ r.course }} @{{ r.room }}</option>
             </select>
           </div>
-          <div class="row"><input style="flex:1" v-model="applyExpect" placeholder="期望安排（如：周三 第2节）"></div>
-          <div class="row"><input style="flex:1" v-model="applyReason" placeholder="原因（如：外出开会）"></div>
-          <button @click="doApply">提交申请</button>
+          <label class="fld-label">期望安排</label>
+          <div class="row"><input style="flex:1" v-model="applyExpect" placeholder="例如：周三 第2节"></div>
+          <label class="fld-label">原因</label>
+          <div class="row"><input style="flex:1" v-model="applyReason" placeholder="例如：外出开会"></div>
+          <button class="big" @click="doApply">提交申请</button>
         </div>
-        <div class="card"><h3>我的申请</h3>
-          <table><tr><th>#</th><th>原安排</th><th>期望</th><th>状态</th><th>意见</th></tr>
-            <tr v-for="r in adjusts"><td>{{ r.id }}</td><td>{{ r.original }}</td><td>{{ r.expectation }}</td><td>{{ r.status }}</td><td>{{ r.review_comment }}</td></tr>
+        <div class="card">
+          <h3>我的申请记录</h3>
+          <table><tr><th>编号</th><th>原安排</th><th>期望</th><th>状态</th><th>审核意见</th></tr>
+            <tr v-for="r in adjusts"><td>#{{ r.id }}</td><td>{{ r.original }}</td><td>{{ r.expectation }}</td><td>{{ r.status }}</td><td>{{ r.review_comment }}</td></tr>
           </table>
         </div>
       </div>
 
-      <!-- 通知 -->
-      <div v-if="role!=='admin' && tab==='notify'" class="card">
+      <!-- ===== 教师/学生 · 通知 ===== -->
+      <div v-if="(role==='teacher' && tab==='notify') || (role==='student' && tab==='notify')" class="card" style="max-width:760px">
         <h3>站内通知</h3>
         <div class="msg info" v-for="n in notifications">{{ n.created_at }} — {{ n.content }}</div>
-        <p v-if="!notifications.length" style="color:#666;font-size:13px">暂无通知</p>
+        <p v-if="!notifications.length" style="color:#666;font-size:14px">暂无通知</p>
+      </div>
+
+      <!-- ===== 学生 · 我的课表 ===== -->
+      <div v-if="role==='student' && tab==='tt'">
+        <div class="page-head">
+          <h2>我的课表</h2>
+          <p class="sub">本人本学期的课表。学校调课后会自动更新并收到通知。</p>
+        </div>
+        <div class="card">
+          <table class="timetable">
+            <tr><th>节次</th><th>周一</th><th>周二</th><th>周三</th><th>周四</th><th>周五</th></tr>
+            <tr v-for="p in 4"><td>第 {{ p }} 节</td>
+              <td v-for="d in 5">
+                <div v-for="r in cellFor(d, p)" :key="r.record_id">
+                  {{ r.course }}<br><small>{{ r.teacher }} @{{ r.room }}</small>
+                </div>
+              </td></tr>
+          </table>
+        </div>
       </div>
     </main>
+    </div>
   </template>
 </div>
 
@@ -292,9 +492,22 @@ Vue.createApp({
     return {
       token: "", loginName: "", role: "", refId: 0,
       loginPass: "", password: "", msg: "", flash: "", flashType: "ok",
-      tab: "home",
-      adminTabs: [{k:"home",n:"概览与导入"},{k:"constraint",n:"约束与偏好"},{k:"adjust",n:"调课审核"},{k:"agent",n:"PiAgent 对话"}],
-      teacherTabs: [{k:"home",n:"我的课表"},{k:"apply",n:"调课申请"},{k:"notify",n:"通知"}],
+      tab: "overview",
+      adminNav: [
+        {k:"overview", no:"首", nm:"总览", ds:"数据与进度一屏看清"},
+        {k:"import", no:"1", nm:"导入数据", ds:"教学计划与基础数据"},
+        {k:"constraint", no:"2", nm:"配置约束", ds:"规则与教师偏好"},
+        {k:"engine", no:"3", nm:"自动排课", ds:"一键求解检查冲突"},
+        {k:"adjust", no:"4", nm:"调课审核", ds:"处理调课申请"},
+        {k:"agent", no:"AI", nm:"智能助手", ds:"PiAgent 问答与操作"},
+        {k:"audit", no:"记", nm:"系统日志", ds:"操作留痕查询"}],
+      teacherNav: [
+        {k:"tt", nm:"我的课表", ds:"查看与导出"},
+        {k:"apply", nm:"调课申请", ds:"提交调课申请"},
+        {k:"notify", nm:"通知", ds:"课表变更通知"}],
+      studentNav: [
+        {k:"tt", nm:"我的课表", ds:"本人课表查询"},
+        {k:"notify", nm:"通知", ds:"课表变更通知"}],
       stats: {}, solving: false, solveReport: "",
       file: null, importTerm: "2026-2027-1", importErrors: [],
       audits: [], constraints: [], preferences: [], pendings: [], adjusts: [],
@@ -307,8 +520,8 @@ Vue.createApp({
   },
   computed: {
     roleCN() { return {admin:"教务管理员", teacher:"任课教师", student:"学生"}[this.role] || ""; },
-    showTimetable() { return this.role==="admin" ? this.tab==="home" :
-                       this.role==="teacher" ? this.tab==="home" : true; },
+    showTimetable() { return this.role==="admin" ? this.tab==="engine" :
+                       this.role==="teacher" ? this.tab==="tt" : this.tab==="tt"; },
   },
   methods: {
     quickLogin(name, pwd) {
@@ -326,10 +539,10 @@ Vue.createApp({
     flashMsg(t, type) { this.flash = t; this.flashType = type || "ok";
       setTimeout(() => { this.flash = ""; }, 6000); },
     async boot() {
-      if (this.role === "admin") { this.tab = "home"; await this.loadHome(); }
-      else { this.tab = "home"; await this.loadTT(this.role); }
+      if (this.role === "admin") { this.tab = "overview"; await this.loadHome(); }
+      else { this.tab = "tt"; await this.loadTT(this.role); }
       if (this.role === "teacher") { await this.loadAdjusts(); }
-      if (this.role !== "admin") { await this.loadNotify(); }
+      await this.loadNotify();
     },
     async loadHome() {
       const b = await api("GET", "/api/base/teachers"); this.teachers = b.data || [];
