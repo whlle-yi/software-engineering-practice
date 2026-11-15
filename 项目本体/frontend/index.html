@@ -52,8 +52,9 @@
   .two-col .left .card.grow { flex:1; min-height:0; overflow:hidden; }
   .two-col .card { margin-bottom:0; display:flex; flex-direction:column; min-height:0; overflow:hidden; }
   .two-col .card h3 { flex:none; }
-  .two-col .row { flex-direction:column; align-items:stretch; }
-  .two-col .row select, .two-col .row button { width:100%; }
+  .two-col .left .row { flex-direction:column; align-items:stretch; }
+  .two-col .left .row select, .two-col .left .row button { width:100%; }
+  .export-links { margin-left:auto; display:flex; gap:14px; white-space:nowrap; }
   .two-col .tbl-scroll { flex:1; max-height:none; min-height:0; overflow-y:auto; }
   .stat-line { display:flex; align-items:baseline; gap:10px; padding:13px 18px;
                background:#EDF1F7; border-radius:8px; margin-bottom:10px; }
@@ -278,43 +279,46 @@
         </div>
 
         <!-- ===== 管理员 · 自动排课 ===== -->
-        <div v-if="role==='admin' && tab==='engine'">
-          <div class="card">
-            <h3>本学期数据</h3>
-            <div class="stat-grid">
-              <div><b>{{ stats.tasks }}</b><span>开课任务</span></div>
-              <div><b>{{ stats.records }}</b><span>已排课表</span></div>
-              <div><b :style="{color: stats.conflicts === 0 ? 'var(--ok)' : 'var(--acc)'}">{{ stats.conflicts }}</b><span>硬冲突</span></div>
+        <div v-if="role==='admin' && tab==='engine'" class="two-col">
+          <div class="left">
+            <div class="card">
+              <h3>本学期数据</h3>
+              <div class="stat-wrap">
+                <div class="stat-line"><b>{{ stats.tasks }}</b><span>开课任务</span></div>
+                <div class="stat-line"><b>{{ stats.records }}</b><span>已排课表</span></div>
+                <div class="stat-line"><b :style="{color: stats.conflicts === 0 ? 'var(--ok)' : 'var(--acc)'}">{{ stats.conflicts }}</b><span>硬冲突</span></div>
+              </div>
             </div>
-          </div>
-          <div class="card" style="text-align:center; padding:40px">
-            <button class="big" @click="solve" :disabled="solving">
-              {{ solving ? '正在自动排课，请稍候…' : '开始自动排课' }}</button>
-            <div class="msg ok" v-if="solveReport" style="margin-top:16px; font-size:16px">{{ solveReport }}</div>
+            <div class="card grow" style="justify-content:center;">
+              <button class="big" @click="solve" :disabled="solving">
+                {{ solving ? '正在自动排课，请稍候…' : '开始自动排课' }}</button>
+              <div class="msg ok" v-if="solveReport" style="margin-top:16px; font-size:15px">{{ solveReport }}</div>
+            </div>
           </div>
           <div class="card">
             <h3>课表预览与导出</h3>
-            <div class="row">
-              <select v-model="ttQuery.view">
+            <div class="row" style="margin-bottom:12px; flex-wrap:nowrap;">
+              <select v-model="ttQuery.view" @change="resetRef">
                 <option value="class">按班级</option><option value="teacher">按教师</option><option value="room">按教室</option>
               </select>
-              <select v-model="ttQuery.ref">
+              <select v-model="ttQuery.ref" @change="loadTT('admin')" style="flex:1">
                 <option v-if="ttQuery.view==='class'" v-for="c in classes" :value="c.id">{{ c.name }}</option>
                 <option v-if="ttQuery.view==='teacher'" v-for="t in teachers" :value="t.id">{{ t.name }}</option>
                 <option v-if="ttQuery.view==='room'" v-for="r in rooms" :value="r.id">{{ r.rno }}</option>
               </select>
-              <button @click="loadTT('admin')">查询课表</button>
-              <a :href="exportUrl('csv')">导出 CSV</a><a :href="exportUrl('xlsx')">导出 Excel</a>
+              <span class="export-links"><a :href="exportUrl('csv')">导出 CSV</a><a :href="exportUrl('xlsx')">导出 Excel</a></span>
             </div>
-            <table class="timetable">
-              <tr><th>节次</th><th>周一</th><th>周二</th><th>周三</th><th>周四</th><th>周五</th></tr>
-              <tr v-for="p in 4"><td>第 {{ p }} 节</td>
-                <td v-for="d in 5">
-                  <div v-for="r in cellFor(d, p)" :key="r.record_id">
-                    {{ r.course }}<br><small>{{ r.teacher }} @{{ r.room }}</small>
-                  </div>
-                </td></tr>
-            </table>
+            <div class="tbl-scroll">
+              <table class="timetable">
+                <tr><th>节次</th><th>周一</th><th>周二</th><th>周三</th><th>周四</th><th>周五</th></tr>
+                <tr v-for="p in 4"><td>第 {{ p }} 节</td>
+                  <td v-for="d in 5">
+                    <div v-for="r in cellFor(d, p)" :key="r.record_id">
+                      {{ r.course }}<br><small>{{ r.teacher }} @{{ r.room }}</small>
+                    </div>
+                  </td></tr>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -544,6 +548,11 @@ Vue.createApp({
   watch: {
     tab(v) {   // 切回约束页时拉最新数据（agent 生成待确认项后立即可见）
       if (this.role === "admin" && v === "constraint") this.refreshConstraintLists();
+      if (this.role === "admin" && v === "engine") {   // 进入排课页：刷新统计并默认渲染一个班级课表
+        this.loadHome();
+        if (!this.ttQuery.ref && this.classes.length) this.ttQuery.ref = this.classes[0].id;
+        this.loadTT("admin");
+      }
     },
   },
   methods: {
@@ -616,6 +625,12 @@ Vue.createApp({
       this.constraints = cs.data.constraints || []; this.preferences = cs.data.preferences || [];
       const pd = await api("GET", "/api/agent/pending");
       this.pendings = Array.isArray(pd.data) ? pd.data : [];
+    },
+    resetRef() {   // 切换视图（班级/教师/教室）时把对象重置为该视图第一项并立即查询
+      const list = this.ttQuery.view === "class" ? this.classes
+                 : this.ttQuery.view === "teacher" ? this.teachers : this.rooms;
+      this.ttQuery.ref = list.length ? list[0].id : "";
+      this.loadTT("admin");
     },
     async rowAction(r) {
       if (r.act === "confirm") {
