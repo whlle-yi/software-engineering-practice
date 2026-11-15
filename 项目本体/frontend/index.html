@@ -46,6 +46,20 @@
   .tbl-scroll { max-height:460px; overflow-y:auto; }
   .tbl-scroll th { position:sticky; top:0; box-shadow:inset 0 -1px var(--line); }
   .tbl-fill { height:calc(100vh - 391px); min-height:200px; max-height:none; }
+  .two-col { display:grid; grid-template-columns:330px 1fr; gap:20px; align-items:stretch;
+             height:calc(100vh - 117px); }
+  .two-col .left { display:flex; flex-direction:column; gap:20px; min-height:0; }
+  .two-col .left .card.grow { flex:1; min-height:0; }
+  .two-col .card { margin-bottom:0; display:flex; flex-direction:column; min-height:0; }
+  .two-col .card h3 { flex:none; }
+  .two-col .row { flex-direction:column; align-items:stretch; }
+  .two-col .row select, .two-col .row button { width:100%; }
+  .two-col .tbl-scroll { flex:1; max-height:none; min-height:0; }
+  .two-col .stat-grid { flex-direction:column; }
+  .two-col .stat-grid div { width:100%; box-sizing:border-box; min-width:0;
+                            display:flex; align-items:baseline; gap:10px; text-align:left; }
+  .two-col .stat-grid b { font-size:26px; }
+  td.lft { text-align:left; }
   button { background:var(--pri); color:#fff; border:none; border-radius:6px;
            padding:9px 20px; cursor:pointer; font-size:15px; }
   button:hover { filter:brightness(1.1); }
@@ -217,42 +231,48 @@
         </div>
 
         <!-- ===== 管理员 · 配置约束 ===== -->
-        <div v-if="role==='admin' && tab==='constraint'">
-          <div class="card">
-            <h3>新增一条软约束</h3>
-            <div class="row">
-              <select v-model="newC.key">
-                <option value="prefer_day">期望某天上课（软）</option>
-                <option value="avoid_day">回避某天上课（软）</option>
-                <option value="max_daily">每日节次上限（软）</option>
-              </select>
-              <select v-model="newC.day"><option>周一</option><option>周二</option><option>周三</option><option>周四</option><option>周五</option></select>
-              <button @click="addConstraint">保存约束</button>
+        <div v-if="role==='admin' && tab==='constraint'" class="two-col">
+          <div class="left">
+            <div class="card">
+              <h3>新增一条软约束</h3>
+              <div class="row col">
+                <select v-model="newC.key">
+                  <option value="prefer_day">期望某天上课（软）</option>
+                  <option value="avoid_day">回避某天上课（软）</option>
+                  <option value="max_daily">每日节次上限（软）</option>
+                </select>
+                <select v-model="newC.day"><option>周一</option><option>周二</option><option>周三</option><option>周四</option><option>周五</option></select>
+                <button @click="addConstraint">保存约束</button>
+              </div>
+            </div>
+            <div class="card grow">
+              <h3>约束概览</h3>
+              <div class="stat-grid">
+                <div><b>{{ consStats.consOn }}<small style="font-size:14px;color:#5A6B82"> / {{ consStats.consTotal }}</small></b><span>软约束启用</span></div>
+                <div><b>{{ consStats.prefOn }}<small style="font-size:14px;color:#5A6B82"> / {{ consStats.prefTotal }}</small></b><span>教师偏好启用</span></div>
+                <div><b :style="{color: consStats.pending ? 'var(--acc)' : 'var(--ok)'}">{{ consStats.pending }}</b><span>待确认项</span></div>
+              </div>
             </div>
           </div>
           <div class="card">
-            <h3>约束清单</h3>
-            <table><tr><th>类型</th><th>参数</th><th>优先级</th><th>状态</th><th>操作</th></tr>
-              <tr v-for="c in constraints"><td>{{ c.key }}</td><td>{{ c.params }}</td><td>{{ c.priority }}</td><td>{{ c.enabled ? '启用' : '停用' }}</td><td><button @click="toggleC(c)">{{ c.enabled ? '停用' : '启用' }}</button></td></tr>
-            </table>
-          </div>
-          <div class="card">
-            <h3>教师偏好（确认后才会参与排课）</h3>
+            <h3>约束清单（{{ allRows.length }} 条）</h3>
             <div class="tbl-scroll">
-              <table><tr><th>教师</th><th>类型</th><th>内容</th><th>状态</th><th>操作</th></tr>
-                <tr v-for="p in preferences"><td>{{ p.teacher_id }}</td><td>{{ p.ptype }}</td><td>{{ p.content }}</td><td>{{ p.status }}</td><td>
-                  <button v-if="p.status==='草稿'" @click="prefStatus(p,'已启用')">启用</button>
-                  <button v-if="p.status==='已启用'" class="warn" @click="prefStatus(p,'已停用')">停用</button>
-                </td></tr>
+              <table>
+                <tr><th>类型</th><th>来源</th><th>内容</th><th>状态</th><th>操作</th></tr>
+                <tr v-for="(r,i) in allRows" :key="i">
+                  <td>{{ r.kind }}</td>
+                  <td>{{ r.src }}</td>
+                  <td class="lft">{{ r.content }}</td>
+                  <td>{{ r.status }}</td>
+                  <td>
+                    <button v-if="r.act==='confirm'" class="warn" @click="rowAction(r)">确认生效</button>
+                    <button v-else-if="r.act==='启用'" @click="rowAction(r)">启用</button>
+                    <button v-else-if="r.act==='停用'" class="warn" @click="rowAction(r)">停用</button>
+                    <span v-else>—</span>
+                  </td>
+                </tr>
               </table>
             </div>
-          </div>
-          <div class="card">
-            <h3>PiAgent 待确认项</h3>
-            <table><tr><th>类型</th><th>内容</th><th>操作</th></tr>
-              <tr v-for="p in pendings"><td>{{ p.kind }}</td><td>{{ p.payload.desc }}</td><td><button @click="confirmPending(p)">确认生效</button></td></tr>
-              <tr v-if="!pendings.length"><td colspan="3">暂无待确认项</td></tr>
-            </table>
           </div>
         </div>
 
@@ -475,6 +495,55 @@ Vue.createApp({
               teacher: "试试：我周二上午有会，尽量别排我的课",
               student: "试试：查课表"}[this.role] || "";
     },
+    allRows() {   // 统一约束清单：PiAgent 待确认项 + 教师偏好 + 管理员软约束
+      const tmap = {};
+      this.teachers.forEach(t => { tmap[t.id] = t; });
+      const keyCN = {prefer_day: "期望某天上课", avoid_day: "回避某天上课", max_daily: "每日节次上限"};
+      const ptypeCN = {prefer: "期望", avoid: "回避", consecutive: "连堂"};
+      const rows = [];
+      this.pendings.forEach(p => rows.push({
+        kind: p.kind === "preference" ? "教师偏好" : "软约束",
+        src: "PiAgent",
+        content: (p.payload && p.payload.desc) || "",
+        status: "待确认", act: "confirm", pid: p.id}));
+      this.preferences.forEach(p => {
+        const t = tmap[p.teacher_id];
+        rows.push({
+          kind: "教师偏好",
+          src: t ? t.name + "（" + t.tno + "）" : "教师#" + p.teacher_id,
+          content: (ptypeCN[p.ptype] || p.ptype) + "：" + p.content,
+          status: p.status,
+          act: p.status === "草稿" ? "启用" : (p.status === "已启用" ? "停用" : ""),
+          pref: p.id});
+      });
+      this.constraints.forEach(c => {
+        let param = "";
+        try {
+          const q = typeof c.params === "string" ? JSON.parse(c.params) : c.params;
+          param = q.day || q.n || "";
+        } catch (e) { param = String(c.params); }
+        rows.push({
+          kind: "软约束", src: "管理员",
+          content: (keyCN[c.key] || c.key) + (param ? "：" + param : ""),
+          status: c.enabled ? "启用" : "停用",
+          act: c.enabled ? "停用" : "启用", cons: c.id});
+      });
+      return rows;
+    },
+    consStats() {
+      return {
+        consTotal: this.constraints.length,
+        consOn: this.constraints.filter(c => c.enabled).length,
+        prefTotal: this.preferences.length,
+        prefOn: this.preferences.filter(p => p.status === "已启用").length,
+        pending: Array.isArray(this.pendings) ? this.pendings.length : 0,
+      };
+    },
+  },
+  watch: {
+    tab(v) {   // 切回约束页时拉最新数据（agent 生成待确认项后立即可见）
+      if (this.role === "admin" && v === "constraint") this.refreshConstraintLists();
+    },
   },
   methods: {
     quickLogin(name, pwd) {
@@ -539,23 +608,25 @@ Vue.createApp({
       const d = await api("POST", "/api/constraint/add", {key: this.newC.key,
         params: {day: this.newC.day, period: this.newC.period || null}, priority: 3});
       this.flashMsg(d.code === 0 ? "约束已新增" : d.message, d.code === 0 ? "ok" : "err");
+      await this.refreshConstraintLists();
+    },
+    async refreshConstraintLists() {
       const cs = await api("GET", "/api/constraint/list");
-      this.constraints = cs.data.constraints;
+      this.constraints = cs.data.constraints || []; this.preferences = cs.data.preferences || [];
+      const pd = await api("GET", "/api/agent/pending");
+      this.pendings = Array.isArray(pd.data) ? pd.data : [];
     },
-    async toggleC(c) {
-      await api("POST", "/api/constraint/status", {id: c.id, enabled: !c.enabled});
-      const cs = await api("GET", "/api/constraint/list"); this.constraints = cs.data.constraints;
-    },
-    async prefStatus(p, s) {
-      await api("POST", "/api/constraint/preference-status", {id: p.id, status: s});
-      const cs = await api("GET", "/api/constraint/list"); this.preferences = cs.data.preferences;
-    },
-    async confirmPending(p) {
-      const d = await api("POST", "/api/agent/confirm", {id: p.id});
-      this.flashMsg(d.code === 0 ? d.data.result : d.message, d.code === 0 ? "ok" : "err");
-      const pd = await api("GET", "/api/agent/pending"); this.pendings = pd.data || [];
-      const cs = await api("GET", "/api/constraint/list");
-      this.constraints = cs.data.constraints; this.preferences = cs.data.preferences;
+    async rowAction(r) {
+      if (r.act === "confirm") {
+        const d = await api("POST", "/api/agent/confirm", {id: r.pid});
+        this.flashMsg(d.code === 0 ? d.data.result : d.message, d.code === 0 ? "ok" : "err");
+      } else if (r.kind === "教师偏好") {
+        await api("POST", "/api/constraint/preference-status",
+                  {id: r.pref, status: r.act === "启用" ? "已启用" : "已停用"});
+      } else {
+        await api("POST", "/api/constraint/status", {id: r.cons, enabled: r.act === "启用"});
+      }
+      await this.refreshConstraintLists();
     },
     async loadAdjusts() {
       const d = await api("GET", "/api/adjust/list"); this.adjusts = d.data || [];
@@ -605,6 +676,7 @@ Vue.createApp({
           ? "★ 已生成待确认项，确认后才会生效（点击待确认项列表中的「确认生效」）。"
           : "★ 已提交教务管理员，管理员确认后生效，可在「通知」中留意结果。";
         this.chat.push({me: false, t: tip});
+        if (this.role === "admin") await this.refreshConstraintLists();
       }
     },
     fabClick() {

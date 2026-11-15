@@ -7,7 +7,8 @@ from services.auth_service import login as _login, authorize as _authorize
 
 
 def ok(payload=None):
-    return jsonify({"code": 0, "data": payload or {}})
+    # 注意：空列表也是合法载荷，不能用 or（否则 [] 被吞成 {}）
+    return jsonify({"code": 0, "data": {} if payload is None else payload})
 
 
 def fail(code, message, status=400):
