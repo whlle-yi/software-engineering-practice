@@ -191,9 +191,6 @@
         <div v-if="role==='admin' && tab==='import'">
           <div class="card">
             <h3>上传教学计划文件</h3>
-            <label class="fld-label">下载模板，按模板填写课程、班级、教师信息</label>
-            <button class="ghost" @click="downloadTemplate">下载模板 CSV</button>
-            <label class="fld-label">选择填好的文件，选择学期，点击导入</label>
             <div class="row">
               <input type="file" @change="pickFile">
               <select v-model="importTerm"><option>2026-2027-1</option><option>2026-2027-2</option></select>
@@ -513,12 +510,6 @@ Vue.createApp({
       this.importErrors = [];
       this.flashMsg("导入成功 " + d.data.success + " 行");
       await this.loadHome();
-    },
-    downloadTemplate() {
-      const csv = "\uFEFF课程名称,课程编号,学时,周次,星期,节次,授课班级,授课教师\n数据结构,C01,4,1-16,周一,1,计科2401,T001\n";
-      const a = document.createElement("a");
-      a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
-      a.download = "教学计划模板.csv"; a.click();
     },
     async addConstraint() {
       const d = await api("POST", "/api/constraint/add", {key: this.newC.key,
