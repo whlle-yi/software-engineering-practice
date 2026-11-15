@@ -2,7 +2,7 @@
 """M5 调课申请与审核（详设第 7 章）：状态机 + 与局部重排同事务（表 7-1）。"""
 from datetime import datetime
 
-from dao import tx, audit
+from services.dao import tx, audit
 from models import db, AdjustRequest, ScheduleRecord, Notification, SysUser, TeachingTask
 
 STATES = ("待审核", "通过", "退回")
@@ -41,7 +41,7 @@ def review(req_id, verdict, comment, operator=""):
         return None, "申请不存在"
     if req.status != "待审核":
         return None, "该申请已流转至终态（%s）" % req.status
-    from engine import relocal
+    from services.engine import relocal
     if verdict == "退回":
         with tx() as s:
             req.status = "退回"

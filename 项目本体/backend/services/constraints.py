@@ -8,7 +8,7 @@
 import json
 from datetime import datetime
 
-from dao import tx, audit
+from services.dao import tx, audit
 from models import db, ConstraintConfig, TeacherPreference
 
 # 硬约束类型集合（M4 支持的全局硬约束）

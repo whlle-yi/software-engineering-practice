@@ -12,7 +12,8 @@ import time
 from flask import request, g
 
 import config
-from dao import tx, audit
+from config import cfg
+from services.dao import tx, audit
 from models import SysUser
 
 # 会话缓存：token -> {user_id, role, ref_id, login_name, expires}
@@ -39,7 +40,7 @@ def hash_password(password: str, salt: str = None) -> str:
     """加盐慢散列（详设 3.6：bcrypt 类思路，用 sha256+salt 迭代模拟慢散列）。"""
     salt = salt or secrets.token_hex(16)
     digest = password
-    for _ in range(config.HASH_COST):
+    for _ in range(cfg.HASH_COST):
         digest = hashlib.sha256((salt + digest).encode()).hexdigest()
     return salt + "$" + digest
 
@@ -57,7 +58,7 @@ def login(login_name: str, password: str):
     token = secrets.token_hex(24)
     _SESSIONS[token] = {
         "user_id": user.id, "role": user.role, "ref_id": user.ref_id,
-        "login_name": user.login_name, "expires": time.time() + config.SESSION_TIMEOUT_SECONDS,
+        "login_name": user.login_name, "expires": time.time() + cfg.SESSION_TIMEOUT_SECONDS,
     }
     return token, user
 

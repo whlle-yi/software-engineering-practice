@@ -15,7 +15,8 @@ import requests
 from flask import request
 
 import config
-from dao import tx, audit
+from config import cfg
+from services.dao import tx, audit
 from models import (db, PendingItem, Teacher, TeacherPreference, Course,
                     TeachingTask, ScheduleRecord, ConstraintConfig, SysUser)
 
@@ -127,7 +128,7 @@ def confirm(pending_id, operator=""):
     if item is None or item.status != "待确认":
         return None, "待确认项不存在或已处理"
     payload = json.loads(item.payload)
-    import constraints as m3
+    import services.constraints as m3
     if item.kind == "preference":
         p, err = m3.save_preference(payload["teacher_id"], _current_term_id(),
                                     payload["ptype"], payload["content"],
@@ -166,14 +167,14 @@ def _structured_check(tool_name, args):
 def _llm_call(instruction):
     """调用外部大模型 API（OpenAI 兼容 + tools），30 秒超时（详设 9.3）。"""
     resp = requests.post(
-        config.LLM_BASE_URL.rstrip("/") + "/chat/completions",
-        headers={"Authorization": "Bearer " + config.LLM_API_KEY},
-        json={"model": config.LLM_MODEL, "messages": [
+        cfg.LLM_BASE_URL.rstrip("/") + "/chat/completions",
+        headers={"Authorization": "Bearer " + cfg.LLM_API_KEY},
+        json={"model": cfg.LLM_MODEL, "messages": [
             {"role": "system", "content": "你是高校排课系统的智能助手 PiAgent，只能通过提供的工具操作排课业务；"
                                           "涉及写操作时必须调用对应工具生成待确认项。"},
             {"role": "user", "content": instruction}],
             "tools": TOOL_SPEC, "temperature": 0.2},
-        timeout=config.LLM_TIMEOUT_SECONDS)
+        timeout=cfg.LLM_TIMEOUT_SECONDS)
     resp.raise_for_status()
     data = resp.json()
     msg = data["choices"][0]["message"]
@@ -219,14 +220,14 @@ def handle(instruction, operator=""):
     """M7 主入口（详设 9.7 流程）：鉴权在路由层；返回 (回答文本, 待确认项列表)。"""
     t0 = time.time()
     try:
-        if config.LLM_API_KEY:
+        if cfg.LLM_API_KEY:
             tool_name, args = _llm_call(instruction)
         else:
             tool_name, args = _stub_call(instruction)
     except (requests.Timeout, requests.RequestException) as e:
         audit(operator, "agent_timeout", "llm_api", str(e)[:100])
         return "外部模型服务暂时不可用（%d 秒超时），PiAgent 已降级停用——排课、调课、课表查询等核心功能不受影响。" \
-               "请稍后重试。" % config.LLM_TIMEOUT_SECONDS, []
+               "请稍后重试。" % cfg.LLM_TIMEOUT_SECONDS, []
     except json.JSONDecodeError:
         return "模型输出格式错误，结构化校验未通过，请重述或修正后重试。", []
 

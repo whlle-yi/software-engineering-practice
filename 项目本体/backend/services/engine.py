@@ -10,7 +10,8 @@ import random
 import time
 
 import config
-from dao import schedule_write_tx
+from config import cfg
+from services.dao import schedule_write_tx
 from models import (db, TeachingTask, ScheduleRecord, Classroom, ClassInfo,
                     ConstraintConfig, TeacherPreference)
 
@@ -101,7 +102,7 @@ def soft_score(sol: Solution, model: Model, prefs_by_teacher, soft_rules):
 def fitness(sol, model, prefs_by_teacher, soft_rules):
     """适应度 = 硬约束罚项（大罚系数）+ 软约束得分（详设 6.6）。"""
     conflicts = hard_conflicts(sol, model)
-    return -config.HARD_PENALTY * len(conflicts) + soft_score(sol, model, prefs_by_teacher, soft_rules)
+    return -cfg.HARD_PENALTY * len(conflicts) + soft_score(sol, model, prefs_by_teacher, soft_rules)
 
 
 def greedy_construct(model: Model, prefs_by_teacher):
@@ -173,8 +174,8 @@ def neighbor(sol: Solution, model: Model, rng):
 def optimize_sa(sol, model, prefs_by_teacher, soft_rules, rng,
                 iterations=None, no_improve=None, deadline=None):
     """模拟退火寻优（详设 6.6(2)：Metropolis 准则、几何降温）。"""
-    iterations = iterations or config.ENGINE_ITERATIONS
-    no_improve = no_improve or config.ENGINE_NO_IMPROVE_ROUNDS
+    iterations = iterations or cfg.ENGINE_ITERATIONS
+    no_improve = no_improve or cfg.ENGINE_NO_IMPROVE_ROUNDS
     cur = sol.copy()
     cur_fit = fitness(cur, model, prefs_by_teacher, soft_rules)
     best, best_fit = cur.copy(), cur_fit
@@ -200,8 +201,8 @@ def optimize_sa(sol, model, prefs_by_teacher, soft_rules, rng,
 def optimize_ga(sol, model, prefs_by_teacher, soft_rules, rng,
                 iterations=None, no_improve=None, deadline=None, pop_size=12):
     """遗传算法寻优（详设 6.6(2)：锦标赛选择、单点交叉、单任务重排变异、精英保留）。"""
-    iterations = iterations or config.ENGINE_ITERATIONS
-    no_improve = no_improve or config.ENGINE_NO_IMPROVE_ROUNDS
+    iterations = iterations or cfg.ENGINE_ITERATIONS
+    no_improve = no_improve or cfg.ENGINE_NO_IMPROVE_ROUNDS
     pop = [(sol.copy(), fitness(sol, model, prefs_by_teacher, soft_rules))]
     for _ in range(pop_size - 1):
         ind = neighbor(sol, model, rng)
@@ -269,7 +270,7 @@ def _soft_rules(term_id):
 def solve(term_id, operator=""):
     """期初全量排课（详设 6.2）：读约束→建模→构造→寻优→检测→写库。返回 (结果 dict, 错误)。"""
     start = time.time()
-    deadline = start + config.ENGINE_TIME_BUDGET_SECONDS
+    deadline = start + cfg.ENGINE_TIME_BUDGET_SECONDS
     refresh_caches()
     tasks = [(t.id, CourseHoursCache.get(t.course_id, 3), ClassSizeCache.get(t.class_id, 30),
               t.teacher_id, t.class_id) for t in TeachingTask.query.filter_by(term_id=term_id).all()]
@@ -284,7 +285,7 @@ def solve(term_id, operator=""):
     initial, err = greedy_construct(model, prefs_by_teacher)
     if err:
         return None, err
-    if config.ENGINE_STRATEGY == "ga":
+    if cfg.ENGINE_STRATEGY == "ga":
         best, _fit, info = optimize_ga(initial, model, prefs_by_teacher, _soft_rules(term_id),
                                        rng, deadline=deadline)
     else:

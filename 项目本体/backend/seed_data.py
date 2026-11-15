@@ -11,7 +11,7 @@ from datetime import datetime
 from flask import Flask
 
 import config
-from dao import tx
+from services.dao import tx
 from models import (db, SysUser, Teacher, Student, ClassInfo, Course, Classroom,
                     Term, TeachingTask)
 
@@ -19,7 +19,7 @@ random.seed(2026)  # 固定种子保证可复现
 
 
 def hash_password(password: str) -> str:
-    from auth import hash_password
+    from services.auth_service import hash_password
     return hash_password(password)
 
 

@@ -5,8 +5,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "backend"))
 
-from engine import (Model, Solution, greedy_construct, optimize_sa, optimize_ga,
-                    hard_conflicts, soft_score)
+from services.engine import (Model, Solution, greedy_construct, optimize_sa,
+                             optimize_ga, hard_conflicts, soft_score)
 
 ROOMS = [(i, 120, "多媒体") for i in range(1, 9)]     # 8 间教室
 

@@ -5,9 +5,7 @@
 排课业务域：term / teaching_task / schedule_record / adjust_request
 约束与偏好域：constraint_config / teacher_preference；审计：audit_log
 """
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from extensions import db
 
 
 class SysUser(db.Model):

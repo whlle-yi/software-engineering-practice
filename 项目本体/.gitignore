@@ -1,0 +1,7 @@
+# 项目本体本地生成物
+backend/prototype.db
+backend/__pycache__/
+backend/blueprints/__pycache__/
+backend/services/__pycache__/
+tests/__pycache__/
+*.pyc
