@@ -41,12 +41,8 @@
   .cover { position:fixed; inset:0; display:flex; overflow:auto;
            background:linear-gradient(90deg, rgba(244,248,252,.42) 0%, rgba(244,248,252,.22) 40%, rgba(244,248,252,0) 60%),
            url("/static/cover_bot.png") 22% center / cover no-repeat, linear-gradient(135deg,#DCEBFA 0%,#BBDCF7 45%,#9CC9F0 100%); }
-  .cover-left { flex:1.4; display:flex; flex-direction:column; justify-content:center;
-           align-self:center; margin:5vh 0 5vh 2vw; padding:4vh 3vw;
-           background:linear-gradient(120deg, rgba(250,252,255,.72), rgba(250,252,255,.34));
-           backdrop-filter:blur(7px); -webkit-backdrop-filter:blur(7px);
-           border:1px solid rgba(255,255,255,.75); border-radius:0 22px 22px 0;
-           box-shadow:0 10px 34px rgba(30,90,160,.16); }
+  .cover-left { flex:1.2; display:flex; flex-direction:column; justify-content:flex-start;
+           padding:11vh 2vw 0 5vw; }
   .cover-brand { display:flex; align-items:center; gap:14px; }
   .cover-logo { width:64px; height:64px; border-radius:16px; background:#fff;
                 display:flex; align-items:center; justify-content:center;
@@ -54,19 +50,9 @@
   .cover-logo svg { width:40px; height:40px; }
   .cover-title { font-size:34px; white-space:nowrap; text-shadow:0 1px 6px rgba(255,255,255,.85), 0 0 14px rgba(255,255,255,.6); font-weight:bold; color:#16324F; letter-spacing:2px;
                  font-family:"Microsoft YaHei","SimHei",sans-serif; }
-  .cover-title-en { font-size:15px; color:#4A6FA5; letter-spacing:1px; margin-top:4px; }
-  .cover-slogan { margin-top:26px; text-shadow:0 1px 4px rgba(255,255,255,.9), 0 0 10px rgba(255,255,255,.6); color:#12488C; font-weight:bold;
-                  font-family:"Microsoft YaHei","SimHei",sans-serif; }
-  .cover-slogan span { border-bottom:3px solid #1B5AA6; padding-bottom:2px; }
-  .cover-feats { margin-top:34px; display:flex; gap:34px; flex-wrap:wrap; }
-  .cover-feat { display:flex; align-items:center; gap:10px; }
-  .cover-feat .ic { width:38px; height:38px; border-radius:10px; background:#fff;
-                    display:flex; align-items:center; justify-content:center;
-                    box-shadow:0 3px 10px rgba(30,90,160,.18); }
-  .cover-feat .ic svg { width:22px; height:22px; }
-  .cover-feat .tx b { font-size:14px; color:#16324F; display:block; font-family:"Microsoft YaHei",sans-serif; }
-  .cover-feat .tx span { font-size:12px; color:#5B7CA8; }
-  .cover-right { flex:1; display:flex; align-items:center; justify-content:center; padding:5vh 4vw; }
+  .cover-title-en { font-size:15px; text-shadow:0 1px 4px rgba(255,255,255,.95), 0 0 10px rgba(255,255,255,.75); color:#4A6FA5; letter-spacing:1px; margin-top:4px; }
+  .cover-right { flex:1; display:flex; align-items:center; justify-content:flex-end;
+           padding:5vh 4vw; }
   .glass { width:100%; max-width:400px; background:rgba(255,255,255,.72);
            backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
            border:1px solid rgba(255,255,255,.8); border-radius:18px;
@@ -84,7 +70,7 @@
   .glass button:hover { filter:brightness(1.08); }
   .glass .hint { font-size:12px; color:#5B7CA8; margin-top:14px; line-height:1.7; }
   @media (max-width:860px) { .cover { flex-direction:column; } .cover-left { padding:6vh 8vw 2vh; }
-    .cover-title { font-size:30px; white-space:normal; } .cover-slogan { font-size:19px; margin-top:14px; }
+    .cover-title { font-size:30px; white-space:normal; }
     .cover-right { padding:2vh 8vw 8vh; } }
 </style>
 </head>
@@ -102,21 +88,7 @@
           <div class="cover-title-en">PiAgent-Empowered University Course Scheduling System</div>
         </div>
       </div>
-      <div class="cover-slogan">让每一堂课，<span>都有最优的安排</span></div>
-      <div class="cover-feats">
-        <div class="cover-feat">
-          <div class="ic"><svg viewBox="0 0 24 24" fill="#4E79A7"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div>
-          <div class="tx"><b>智能排课</b><span>约束求解 分钟级出表</span></div>
-        </div>
-        <div class="cover-feat">
-          <div class="ic"><svg viewBox="0 0 24 24" fill="#4E79A7"><path d="M5 20h14v-2H5v2zM12 2 3 12h4v6h10v-6h4L12 2z"/></svg></div>
-          <div class="tx"><b>冲突检测</b><span>硬冲突为零可保证</span></div>
-        </div>
-        <div class="cover-feat">
-          <div class="ic"><svg viewBox="0 0 24 24" fill="#4E79A7"><path d="M12 2a2 2 0 0 1 2 2v1h3a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3V4a2 2 0 0 1 2-2zm-1 6v2H9v2h2v2h2v-2h2v-2h-2V8h-2z"/></svg></div>
-          <div class="tx"><b>PiAgent 调整</b><span>自然语言 轻松管理</span></div>
-        </div>
-      </div>
+    </div>
     </div>
     <div class="cover-right">
       <div class="glass">
