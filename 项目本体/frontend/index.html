@@ -55,10 +55,11 @@
   .two-col .row { flex-direction:column; align-items:stretch; }
   .two-col .row select, .two-col .row button { width:100%; }
   .two-col .tbl-scroll { flex:1; max-height:none; min-height:0; overflow-y:auto; }
-  .two-col .stat-grid { flex-direction:column; flex:1; min-height:0; }
-  .two-col .stat-grid div { width:100%; box-sizing:border-box; min-width:0; min-height:0;
-                            flex:1; display:flex; align-items:center; gap:10px; text-align:left; }
-  .two-col .stat-grid b { font-size:24px; }
+  .stat-line { display:flex; align-items:baseline; gap:10px; padding:13px 18px;
+               background:#EDF1F7; border-radius:8px; margin-bottom:10px; }
+  .stat-line b { font-size:24px; color:var(--pri-deep); }
+  .stat-line span { font-size:13px; color:#5A6B82; }
+  .stat-wrap { flex:1; min-height:0; overflow-y:auto; }
   td.lft { text-align:left; }
   button { background:var(--pri); color:#fff; border:none; border-radius:6px;
            padding:9px 20px; cursor:pointer; font-size:15px; }
@@ -247,10 +248,10 @@
             </div>
             <div class="card grow">
               <h3>约束概览</h3>
-              <div class="stat-grid">
-                <div><b>{{ consStats.consOn }}<small style="font-size:14px;color:#5A6B82"> / {{ consStats.consTotal }}</small></b><span>软约束启用</span></div>
-                <div><b>{{ consStats.prefOn }}<small style="font-size:14px;color:#5A6B82"> / {{ consStats.prefTotal }}</small></b><span>教师偏好启用</span></div>
-                <div><b :style="{color: consStats.pending ? 'var(--acc)' : 'var(--ok)'}">{{ consStats.pending }}</b><span>待确认项</span></div>
+              <div class="stat-wrap">
+                <div class="stat-line"><b>{{ consStats.consOn }}<small style="font-size:14px;color:#5A6B82"> / {{ consStats.consTotal }}</small></b><span>软约束启用</span></div>
+                <div class="stat-line"><b>{{ consStats.prefOn }}<small style="font-size:14px;color:#5A6B82"> / {{ consStats.prefTotal }}</small></b><span>教师偏好启用</span></div>
+                <div class="stat-line"><b :style="{color: consStats.pending ? 'var(--acc)' : 'var(--ok)'}">{{ consStats.pending }}</b><span>待确认项</span></div>
               </div>
             </div>
           </div>
