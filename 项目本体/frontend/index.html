@@ -38,11 +38,11 @@
   .stat span { font-size:12px; color:#666; }
   .timetable td { height:34px; }
   /* ---- 登录封面（参考左右分栏品牌页布局，纯 CSS 无外部图片） ---- */
-  .cover { position:fixed; inset:0; display:flex; overflow:auto;
+  .cover { position:fixed; inset:0; display:grid; overflow:auto; grid-template-columns:1.25fr 1fr; grid-template-rows:100%;
            background:linear-gradient(90deg, rgba(244,248,252,.42) 0%, rgba(244,248,252,.22) 40%, rgba(244,248,252,0) 60%),
            url("/static/cover_bot.png") 22% center / cover no-repeat, linear-gradient(135deg,#DCEBFA 0%,#BBDCF7 45%,#9CC9F0 100%); }
-  .cover-left { flex:1.2; display:flex; flex-direction:column; justify-content:flex-start;
-           padding:11vh 2vw 0 5vw; }
+  .cover-left { flex:1.2; display:flex; flex-direction:column; justify-content:center;
+           align-items:flex-start; padding:0 2vw 9vh 5vw; }
   .cover-brand { display:flex; align-items:center; gap:14px; }
   .cover-logo { width:64px; height:64px; border-radius:16px; background:#fff;
                 display:flex; align-items:center; justify-content:center;
@@ -51,8 +51,7 @@
   .cover-title { font-size:34px; white-space:nowrap; text-shadow:0 1px 6px rgba(255,255,255,.85), 0 0 14px rgba(255,255,255,.6); font-weight:bold; color:#16324F; letter-spacing:2px;
                  font-family:"Microsoft YaHei","SimHei",sans-serif; }
   .cover-title-en { font-size:15px; text-shadow:0 1px 4px rgba(255,255,255,.95), 0 0 10px rgba(255,255,255,.75); color:#4A6FA5; letter-spacing:1px; margin-top:4px; }
-  .cover-right { flex:1; display:flex; align-items:center; justify-content:flex-end;
-           padding:5vh 4vw; }
+  .cover-right { position:absolute; right:4vw; top:50%; transform:translateY(-50%); }
   .glass { width:100%; max-width:400px; background:rgba(255,255,255,.72);
            backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
            border:1px solid rgba(255,255,255,.8); border-radius:18px;
