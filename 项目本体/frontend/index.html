@@ -16,8 +16,16 @@
   header .who { font-size:14px; }
   header .who button { margin-left:14px; background:rgba(255,255,255,.15); font-size:13px; }
   .shell { display:flex; min-height:calc(100vh - 55px); }
-  aside { width:220px; background:var(--pri-deep); color:#fff; padding:16px 0; flex-shrink:0; }
-  aside .nav-item { padding:16px 20px 16px 18px; cursor:pointer;
+  aside { width:200px; background:var(--pri-deep); color:#fff; padding:12px 0;
+          flex-shrink:0; transition:width .18s ease; overflow:hidden; }
+  aside.collapsed { width:62px; }
+  aside .fold-btn { width:100%; background:none; color:#fff; border:none;
+                    padding:6px 16px 14px; font-size:16px; text-align:right;
+                    cursor:pointer; opacity:.7; }
+  aside .fold-btn:hover { opacity:1; }
+  aside .nav-item { padding:15px 12px 15px 16px; cursor:pointer; white-space:nowrap;
+                    border-left:4px solid transparent; }
+  aside.collapsed .nav-item { padding:15px 0; text-align:center; }
                     border-left:4px solid transparent; }
   aside .nav-item:hover { background:rgba(255,255,255,.08); }
   aside .nav-item.on { background:rgba(255,255,255,.16); border-left-color:var(--acc); }
@@ -94,6 +102,25 @@
                      font-size:13px; padding:11px 6px; border-radius:8px; }
   .glass .demo-btn:hover { background:var(--pri); color:#fff; }
   .glass .msg { margin-top:16px; }
+  /* ---- PiAgent 悬浮球与悬浮窗（仅管理员可见；机器人形象） ---- */
+  .agent-fab { position:fixed; right:26px; bottom:26px; width:64px; height:64px;
+               border-radius:50%; background:var(--pri); border:3px solid #fff;
+               cursor:pointer; box-shadow:0 6px 22px rgba(30,90,160,.4); z-index:60;
+               display:flex; align-items:center; justify-content:center; }
+  .agent-fab:hover { filter:brightness(1.12); }
+  .agent-fab svg { width:44px; height:44px; }
+  .agent-win { position:fixed; right:26px; bottom:102px; width:380px; height:500px;
+               background:#fff; border-radius:14px; border:1px solid var(--line);
+               box-shadow:0 14px 44px rgba(30,90,160,.3); z-index:60;
+               display:flex; flex-direction:column; overflow:hidden; }
+  .agent-win .aw-head { background:var(--pri-deep); color:#fff; padding:12px 16px;
+                        display:flex; justify-content:space-between; align-items:center; }
+  .agent-win .aw-head .t { font-size:15px; font-weight:bold; }
+  .agent-win .aw-head button { background:none; font-size:16px; padding:0 4px; }
+  .agent-win .chat { flex:1; margin:0; border:none; border-radius:0; }
+  .agent-win .send { display:flex; gap:8px; padding:10px;
+                     border-top:1px solid var(--line); }
+  .agent-win .send input { flex:1; }
   @media (max-width:860px) { .cover { grid-template-columns:1fr; grid-template-rows:auto auto; }
     .cover-left { padding:6vh 8vw 2vh; }
     .cover-title { font-size:30px; white-space:normal; }
@@ -145,19 +172,11 @@
         <button @click="doLogout">退出</button></div>
     </header>
     <div class="shell">
-      <aside v-if="role==='admin'">
-        <div v-for="n in adminNav" :key="n.k" class="nav-item" :class="{on: tab===n.k}" @click="tab=n.k">
-          <span class="nm">{{ n.no }} {{ n.nm }}</span>
-        </div>
-      </aside>
-      <aside v-else-if="role==='teacher'">
-        <div v-for="n in teacherNav" :key="n.k" class="nav-item" :class="{on: tab===n.k}" @click="tab=n.k">
-          <span class="nm">{{ n.nm }}</span>
-        </div>
-      </aside>
-      <aside v-else>
-        <div v-for="n in studentNav" :key="n.k" class="nav-item" :class="{on: tab===n.k}" @click="tab=n.k">
-          <span class="nm">{{ n.nm }}</span>
+      <aside :class="{collapsed: collapsed}">
+        <button class="fold-btn" @click="collapsed = !collapsed">{{ collapsed ? '»' : '«' }}</button>
+        <div v-for="n in currentNav" :key="n.k" class="nav-item" :class="{on: tab===n.k}" @click="tab=n.k">
+          <span class="no" v-if="collapsed">{{ n.no }}</span>
+          <span class="nm" v-else>{{ n.no }} {{ n.nm }}</span>
         </div>
       </aside>
       <main class="content">
@@ -281,18 +300,6 @@
           </div>
         </div>
 
-        <!-- ===== 管理员 · PiAgent 对话 ===== -->
-        <div v-if="role==='admin' && tab==='agent'">
-          <div class="card">
-            <h3>PiAgent 智能助手（{{ agentMode==='stub' ? '桩模式' : '真实大模型' }}）</h3>
-            <div class="chat"><div v-for="(b,i) in chat" :key="i" class="b" :class="{me: b.me}">{{ b.t }}</div></div>
-            <div class="row"><input style="flex:1" v-model="chatIn" @keyup.enter="sendChat"
-              placeholder="试试：T003 希望尽量安排在周二上午 / 现在有多少门课程？">
-              <button @click="sendChat">发送</button></div>
-            <p style="font-size:13px;color:#666">写操作（偏好/约束）将生成待确认项，经「配置约束」页确认后生效。</p>
-          </div>
-        </div>
-
         <!-- ===== 管理员 · 系统日志 ===== -->
         <div v-if="role==='admin' && tab==='audit'">
           <div class="card">
@@ -366,6 +373,31 @@
         </div>
       </main>
     </div>
+
+    <!-- PiAgent 悬浮球与悬浮窗（仅管理员） -->
+    <template v-if="role==='admin'">
+      <div class="agent-fab" v-if="!agentOpen" @click="agentOpen = true" title="PiAgent 智能助手">
+        <svg viewBox="0 0 64 64">
+          <rect x="10" y="14" width="44" height="40" rx="14" fill="#fff"/>
+          <rect x="18" y="24" width="28" height="18" rx="9" fill="#16324F"/>
+          <circle cx="27" cy="33" r="3.5" fill="#7EC3F5"/>
+          <circle cx="37" cy="33" r="3.5" fill="#7EC3F5"/>
+          <rect x="26" y="40" width="12" height="3" rx="1.5" fill="#7EC3F5"/>
+          <line x1="32" y1="14" x2="32" y2="8" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="32" cy="7" r="3" fill="#F28E2B"/>
+        </svg>
+      </div>
+      <div class="agent-win" v-else>
+        <div class="aw-head">
+          <span class="t">PiAgent 智能助手（{{ agentMode==='stub' ? '桩模式' : '真实大模型' }}）</span>
+          <button @click="agentOpen = false">✕</button>
+        </div>
+        <div class="chat"><div v-for="(b,i) in chat" :key="i" class="b" :class="{me: b.me}">{{ b.t }}</div></div>
+        <div class="send"><input style="flex:1" v-model="chatIn" @keyup.enter="sendChat"
+          placeholder="试试：T003 希望尽量安排在周二上午">
+          <button @click="sendChat">发送</button></div>
+      </div>
+    </template>
   </template>
 </div>
 
@@ -408,10 +440,15 @@ Vue.createApp({
       ttView: "", ttRows: [], ttQuery: {view:"class", ref:""},
       applyRecord: "", applyExpect: "", applyReason: "",
       notifications: [], chat: [], chatIn: "", agentMode: "stub",
+      collapsed: false, agentOpen: false,
     };
   },
   computed: {
     roleCN() { return {admin:"教务管理员", teacher:"任课教师", student:"学生"}[this.role] || ""; },
+    currentNav() {
+      return {admin: this.adminNav, teacher: this.teacherNav,
+              student: this.studentNav}[this.role] || [];
+    },
   },
   methods: {
     quickLogin(name, pwd) {
@@ -544,7 +581,7 @@ Vue.createApp({
       this.agentMode = d.data.mode;
       this.chat.push({me: false, t: d.data.answer});
       if (d.data.pendings && d.data.pendings.length)
-        this.chat.push({me: false, t: "★ 已生成待确认项，请在「配置约束」页确认后生效。"});
+        this.chat.push({me: false, t: "★ 已生成待确认项，确认后才会生效（点击待确认项列表中的「确认生效」）。"});
     },
   },
 }).mount("#app");
