@@ -2,6 +2,7 @@
 """M7 PiAgent 智能体：对话（三角色，工具按角色差异化）、待确认项、确认闭环（详设第 9 章）。"""
 import json
 
+import requests
 from flask import Blueprint, current_app, request
 
 import config
@@ -18,6 +19,28 @@ def api_agent_chat():
     if err:
         return err
     data = body_json()
+    # 优先委托 pi-bridge（开源 pi agent harness；桥不可达/异常时回退内置桩路径）
+    bridge_url = current_app.config.get("PI_BRIDGE_URL", "")
+    if bridge_url:
+        try:
+            r = requests.post(bridge_url.rstrip("/") + "/chat",
+                              json={"instruction": data.get("instruction", ""), "role": sess["role"]},
+                              headers={"X-Bridge-Token": current_app.config.get("PI_BRIDGE_TOKEN", "")},
+                              timeout=90)
+            d = r.json()
+            if d.get("code") == 0:
+                pendings = []
+                for p in (d["data"].get("pendings") or []):
+                    meta = p.get("pending") if isinstance(p, dict) and "pending" in p else p
+                    if not (isinstance(meta, dict) and "id" in meta):
+                        continue
+                    item = PendingItem.query.get(meta["id"])
+                    if item:
+                        pendings.append({"id": item.id, "kind": item.kind,
+                                         "payload": json.loads(item.payload)})
+                return ok({"answer": d["data"]["answer"], "mode": "pi", "pendings": pendings})
+        except (requests.RequestException, ValueError):
+            pass  # 桥不可达 → 回退桩路径（核心功能不受影响）
     answer, pendings = m7.handle(data.get("instruction", ""), operator=sess["login_name"],
                                  role=sess["role"], ref_id=sess.get("ref_id"))
     return ok({"answer": answer,

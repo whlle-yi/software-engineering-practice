@@ -9,16 +9,23 @@
 //   PI_MODEL         模型 id（默认 glm-4-flash）
 //   PI_BASE_URL      自定义 OpenAI 兼容端点（可选）
 //   PI_API_KEY       LLM API key（缺省时 /chat 返回 503 提示，骨架其余功能正常）
+import fs from "node:fs";
 import http from "node:http";
 import { Agent } from "@earendil-works/pi-agent-core";
 import { builtinModels } from "@earendil-works/pi-ai/providers/all";
 
+// 本地 .env（git 忽略）→ process.env：key 等敏感配置绝不入库
+for (const line of (fs.readFileSync(new URL("./.env", import.meta.url), "utf-8").split(/\r?\n/))) {
+  const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
+  if (m && !(m[1] in process.env)) process.env[m[1]] = m[2];
+}
+
 const PORT = Number(process.env.PI_BRIDGE_PORT || 8710);
 const FLASK = process.env.FLASK_URL || "http://127.0.0.1:5000";
 const BRIDGE_TOKEN = process.env.PI_BRIDGE_TOKEN || "";
-const PROVIDER = process.env.PI_PROVIDER || "zai";
-const MODEL_ID = process.env.PI_MODEL || "glm-4-flash";
-const API_KEY = process.env.PI_API_KEY || process.env.LLM_API_KEY || "";
+const PROVIDER = process.env.PI_PROVIDER || "deepseek";
+const MODEL_ID = process.env.PI_MODEL || "deepseek-flash";
+const API_KEY = process.env.PI_API_KEY || process.env.DEEPSEEK_API_KEY || process.env.LLM_API_KEY || "";
 
 const SYSTEM_PROMPT =
   "你是高校排课系统的内置智能体 PiAgent，只能通过提供的工具操作排课业务。" +
@@ -112,8 +119,10 @@ async function runChat(instruction, role) {
         if (part.type === "text") finalText += part.text;
       }
     }
-    if (event.type === "tool_execution_end" && event.result?.details?.pending) {
-      pendings.push(event.result.details);
+    if (event.type === "tool_execution_end") {
+      const d = event.result?.details ?? {};
+      const meta = d.pending ?? d.data?.pending ?? null;   // 兼容 details 包装差异
+      if (meta?.id) pendings.push({id: meta.id, kind: meta.kind ?? "preference"});
     }
   });
   await agent.prompt(

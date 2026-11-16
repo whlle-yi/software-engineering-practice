@@ -42,10 +42,11 @@ class Config:
 
 
 class TestingConfig(Config):
-    """测试环境：SQLite 内存库（conftest.py 使用）。"""
+    """测试环境：SQLite 内存库（conftest.py 使用）；pi-bridge 委托禁用（测试走内置桩）。"""
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite://"
     SQLALCHEMY_ENGINE_OPTIONS = {"connect_args": {"check_same_thread": False}}
+    PI_BRIDGE_URL = ""
 
 
 def engine_options_for(uri):
