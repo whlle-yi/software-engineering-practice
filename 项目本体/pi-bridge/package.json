@@ -1,0 +1,15 @@
+{
+  "name": "pi-bridge",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "PiAgent 桥接层：基于开源 pi agent harness（earendil-works/pi）驱动排课白名单工具循环，供 Flask 后端委托",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@earendil-works/pi-agent-core": "^1.5.2",
+    "@earendil-works/pi-ai": "^1.5.2"
+  }
+}

@@ -30,6 +30,9 @@ class Config:
     LLM_BASE_URL = os.environ.get("LLM_BASE_URL", "https://open.bigmodel.cn/api/paas/v4")
     LLM_MODEL = os.environ.get("LLM_MODEL", "glm-4-flash")
     LLM_TIMEOUT_SECONDS = 30
+    # pi-bridge（开源 pi agent harness 桥接层，见 项目本体/pi-bridge/）
+    PI_BRIDGE_URL = os.environ.get("PI_BRIDGE_URL", "http://127.0.0.1:8710")
+    PI_BRIDGE_TOKEN = os.environ.get("PI_BRIDGE_TOKEN", "pi-bridge-local")
     ENGINE_STRATEGY = os.environ.get("ENGINE_STRATEGY", "sa")
     ENGINE_ITERATIONS = int(os.environ.get("ENGINE_ITERATIONS", "2000"))
     ENGINE_NO_IMPROVE_ROUNDS = 200
