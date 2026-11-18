@@ -59,14 +59,14 @@
   th,td { border:none; border-bottom:1px solid var(--line); padding:10px 12px; text-align:center; }
   th { background:#F5F8FC; color:var(--pri-deep); font-size:13.5px; }
   tbody tr:hover td { background:#F7FAFD; }
-  .badge { background:#E5EEFF; color:#2B6CB0; padding:3px 11px; border-radius:999px;
+  .badge { background:#E5EEFF; color:#2B6CB0; padding:3px 10px; border-radius:6px;
            font-size:12.5px; display:inline-block; }
   .mini { padding:4px 14px; font-size:12.5px; background:#fff; color:var(--pri);
-          border:1px solid #C3CFDD; border-radius:999px; }
+          border:1px solid #C3CFDD; border-radius:8px; }
   .mini:hover { border-color:var(--pri); }
   .course-ico { margin-right:8px; }
   .search-box { display:flex; align-items:center; gap:8px; background:#F5F8FC;
-                border:1px solid var(--line); border-radius:999px; padding:8px 14px; width:270px; }
+                border:1px solid var(--line); border-radius:10px; padding:8px 14px; width:270px; }
   .search-box input { border:none; background:none; outline:none; flex:1; font-size:13px; }
   .tbl-tools { justify-content:space-between; margin-bottom:6px; }
   .pager { display:flex; align-items:center; gap:6px; margin-top:14px; font-size:13px; color:#5A6B82; }
@@ -136,6 +136,13 @@
                      font-size:12px; line-height:1.15; }
   .timetable .cell small { display:block; font-size:10px; line-height:1.2; }
   .timetable small { color:#5A6B82; }
+  .ico { width:16px; height:16px; display:inline-flex; align-items:center;
+         margin-right:2px; }
+  .ico svg, .course-ico svg { width:16px; height:16px; }
+  .course-ico { display:inline-flex; align-items:center; width:18px;
+                margin-right:8px; color:#6B7487; }
+  .search-box .ico svg { width:15px; height:15px; color:#7B8494; }
+  .stat-line b, .stat-grid b { font-variant-numeric: tabular-nums; }
   .chat { max-height:380px; overflow-y:auto; border:1px solid var(--line);
           padding:14px; margin-bottom:10px; border-radius:6px; }
   .chat .b { margin-bottom:10px; font-size:15px; line-height:1.7; }
@@ -156,10 +163,9 @@
                  font-family:"Microsoft YaHei","SimHei",sans-serif; }
   .cover-title-en { font-size:15px; text-shadow:0 1px 4px rgba(255,255,255,.95), 0 0 10px rgba(255,255,255,.75); color:#4A6FA5; letter-spacing:1px; margin-top:4px; }
   .cover-right { position:absolute; right:4vw; top:50%; transform:translateY(-50%); }
-  .glass { width:440px; height:440px; background:rgba(255,255,255,.72);
-           backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-           border:1px solid rgba(255,255,255,.8); border-radius:18px;
-           padding:46px 44px; box-shadow:0 12px 40px rgba(30,90,160,.28);
+  .glass { width:440px; height:440px; background:#fff;
+           border:1px solid var(--line); border-radius:16px;
+           padding:46px 44px; box-shadow:0 8px 24px rgba(0,0,0,.08);
            display:flex; flex-direction:column; }
   .glass h3 { font-size:22px; color:#16324F; border-bottom:3px solid var(--pri);
               display:inline-block; padding-bottom:6px; }
@@ -193,7 +199,8 @@
                         display:flex; justify-content:space-between; align-items:center;
                         cursor:move; touch-action:none; user-select:none; }
   .agent-win .aw-head .t { font-size:15px; font-weight:bold; }
-  .agent-win .aw-head button { background:none; font-size:16px; padding:0 4px; }
+  .agent-win .aw-head button { background:none; padding:2px; }
+  .aw-x .ico svg { width:15px; height:15px; }
   .agent-win .chat { flex:1; margin:0; border:none; border-radius:0; }
   .agent-win .send { display:flex; gap:8px; padding:10px;
                      border-top:1px solid var(--line); }
@@ -254,7 +261,7 @@
       <div class="who">
         <svg class="shield" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3zm-1.2 12.6l5-5-1.4-1.4-3.6 3.6-1.8-1.8-1.4 1.4 3.2 3.2z"/></svg>
         <span>{{ loginName }}（{{ roleCN }}）</span><span class="caret">▾</span>
-        <button @click="doLogout">⎋ 退出</button>
+        <button @click="doLogout"><span class="ico" v-html="icon('logout')"></span>退出</button>
       </div>
     </header>
     <div class="shell">
@@ -272,24 +279,24 @@
         <!-- ===== 管理员 · 导入数据 ===== -->
         <div v-if="role==='admin' && tab==='import'">
           <div class="card upload-card">
-            <h3>📤 上传教学计划文件</h3>
-            <p class="card-sub">支持 Excel、CSV 等格式，快速导入课程数据</p>
+            <h3><span class="ico" v-html="icon('upload')"></span>上传教学计划文件</h3>
+            <p class="card-sub">支持 Excel / CSV 格式，导入后生成开课任务</p>
             <div class="row">
-              <label class="file-btn">📁 选择文件
+              <label class="file-btn"><span class="ico" v-html="icon('folder')"></span>选择文件
                 <input type="file" style="display:none" @change="pickFile"></label>
               <span style="font-size:13px;color:#5A6B82">{{ file ? file.name : "未选择文件" }}</span>
               <select v-model="importTerm"><option>2026-2027-1</option><option>2026-2027-2</option></select>
-              <button class="big" @click="doImport" :disabled="!file">✈ 导入</button>
+              <button class="big" @click="doImport" :disabled="!file"><span class="ico" v-html="icon('send')"></span>导入</button>
             </div>
             <div class="msg err" v-if="importErrors.length">
               <div v-for="e in importErrors">{{ e }}</div>
             </div>
           </div>
           <div class="card">
-            <h3>📋 已导入的开课任务（{{ filteredTasks.length }} 条）</h3>
+            <h3><span class="ico" v-html="icon('list')"></span>已导入的开课任务（{{ filteredTasks.length }} 条）</h3>
             <div class="row tbl-tools">
-              <div class="search-box">🔍
-                <input v-model="searchQuery" placeholder="搜索课程 / 教师 / 班级…"></div>
+              <div class="search-box"><span class="ico" v-html="icon('search')"></span>
+                <input v-model="searchQuery" placeholder="搜索课程 / 教师 / 班级"></div>
               <select v-model="filterClass">
                 <option value="">全部班级</option>
                 <option v-for="c in classList" :key="c">{{ c }}</option>
@@ -298,7 +305,7 @@
             <table>
               <tr><th>课程</th><th>教师</th><th>班级</th><th>周次</th><th>操作</th></tr>
               <tr v-for="(t,i) in pagedTasks" :key="i">
-                <td class="lft"><span class="course-ico">{{ courseIcon(t.course) }}</span>{{ t.course }}</td>
+                <td class="lft"><span class="course-ico" v-html="courseIcon(t.course)"></span>{{ t.course }}</td>
                 <td>{{ t.teacher }}</td>
                 <td><span class="badge">{{ t["class"] }}</span></td>
                 <td>{{ t.weeks }}</td>
@@ -316,7 +323,7 @@
           </div>
           <div class="modal-mask" v-if="detailTask" @click.self="detailTask = null">
             <div class="modal">
-              <h4>{{ courseIcon(detailTask.course) }} {{ detailTask.course }}</h4>
+              <h4><span class="ico" v-html="courseIcon(detailTask.course)"></span>{{ detailTask.course }}</h4>
               <table>
                 <tr><th>授课教师</th><td>{{ detailTask.teacher }}</td></tr>
                 <tr><th>授课班级</th><td>{{ detailTask["class"] }}</td></tr>
@@ -331,7 +338,7 @@
         <div v-if="role==='admin' && tab==='constraint'" class="two-col">
           <div class="left">
             <div class="card">
-              <h3>🧩 添加约束</h3>
+              <h3><span class="ico" v-html="icon('sliders')"></span>添加约束</h3>
               <div class="row col">
                 <select v-model="newC.key">
                   <option value="prefer_day">期望某天上课（软）</option>
@@ -343,7 +350,7 @@
               </div>
             </div>
             <div class="card grow">
-              <h3>📊 约束概览</h3>
+              <h3><span class="ico" v-html="icon('chart')"></span>约束概览</h3>
               <div class="stat-wrap">
                 <div class="stat-line"><b>{{ consStats.consOn }}<small style="font-size:14px;color:#5A6B82"> / {{ consStats.consTotal }}</small></b><span>软约束启用</span></div>
                 <div class="stat-line"><b>{{ consStats.prefOn }}<small style="font-size:14px;color:#5A6B82"> / {{ consStats.prefTotal }}</small></b><span>教师偏好启用</span></div>
@@ -352,7 +359,7 @@
             </div>
           </div>
           <div class="card">
-            <h3>📋 约束清单（{{ allRows.length }} 条）</h3>
+            <h3><span class="ico" v-html="icon('list')"></span>约束清单（{{ allRows.length }} 条）</h3>
             <div class="tbl-scroll">
               <table>
                 <tr><th>类型</th><th>来源</th><th>内容</th><th>状态</th><th>操作</th></tr>
@@ -377,7 +384,7 @@
         <div v-if="role==='admin' && tab==='engine'" class="two-col narrow">
           <div class="left">
             <div class="card">
-              <h3>📊 本学期数据</h3>
+              <h3><span class="ico" v-html="icon('chart')"></span>本学期数据</h3>
               <div class="stat-wrap">
                 <div class="stat-line"><b>{{ stats.tasks }}</b><span>开课任务</span></div>
                 <div class="stat-line"><b>{{ stats.records }}</b><span>已排课表</span></div>
@@ -391,7 +398,7 @@
             </div>
           </div>
           <div class="card">
-            <h3>📅 课表预览与导出</h3>
+            <h3><span class="ico" v-html="icon('calendar')"></span>课表预览与导出</h3>
             <div class="row" style="margin-bottom:12px; flex-wrap:nowrap;">
               <select v-model="ttQuery.view" @change="resetRef">
                 <option value="class">按班级</option><option value="teacher">按教师</option><option value="room">按教室</option>
@@ -426,7 +433,7 @@
         <!-- ===== 管理员 · 调课审核 ===== -->
         <div v-if="role==='admin' && tab==='adjust'">
           <div class="card">
-            <h3>✅ 调课申请列表</h3>
+            <h3><span class="ico" v-html="icon('shield')"></span>调课申请列表</h3>
             <div class="tbl-scroll">
               <table><tr><th>申请</th><th>原安排</th><th>期望</th><th>原因</th><th>状态</th><th>操作</th></tr>
                 <tr v-for="r in adjusts"><td>#{{ r.id }}</td><td>{{ r.original }}</td><td>{{ r.expectation }}</td><td>{{ r.reason }}</td>
@@ -442,7 +449,7 @@
         <!-- ===== 管理员 · 系统日志 ===== -->
         <div v-if="role==='admin' && tab==='audit'">
           <div class="card">
-            <h3>📄 操作留痕（最近 100 条）</h3>
+            <h3><span class="ico" v-html="icon('file')"></span>操作留痕（最近 100 条）</h3>
             <div class="tbl-scroll">
               <table><tr><th>时间</th><th>操作者</th><th>动作</th><th>对象</th><th>详情</th></tr>
                 <tr v-for="a in audits"><td>{{ a.created_at }}</td><td>{{ a.operator }}</td><td>{{ a.action }}</td><td>{{ a.target }}</td><td>{{ a.detail }}</td></tr>
@@ -454,7 +461,7 @@
         <!-- ===== 教师 · 我的课表 ===== -->
         <div v-if="role==='teacher' && tab==='tt'">
           <div class="card">
-            <h3>📅 我的课表</h3>
+            <h3><span class="ico" v-html="icon('calendar')"></span>我的课表</h3>
             <div class="row">
               <button @click="loadTT('teacher')">刷新</button>
               <a :href="exportUrl('csv')">导出 CSV</a>
@@ -507,7 +514,7 @@
 
         <!-- ===== 学生 · 我的课表 ===== -->
         <div v-if="role==='student' && tab==='tt'" class="card">
-          <h3>📅 我的课表</h3>
+          <h3><span class="ico" v-html="icon('calendar')"></span>我的课表</h3>
           <table class="timetable">
             <tr><th>节次</th><th>周一</th><th>周二</th><th>周三</th><th>周四</th><th>周五</th></tr>
             <tr v-for="s in slotRows" :key="s.key">
@@ -544,7 +551,7 @@
       <div class="agent-win" v-else :style="{left: winPos.x+'px', top: winPos.y+'px'}">
         <div class="aw-head" @pointerdown="dragWin">
           <span class="t">PiAgent 智能助手·{{ agentRoleLabel }}（{{ agentMode==='stub' ? '桩模式' : '真实大模型' }}）</span>
-          <button @pointerdown.stop @click="agentOpen = false">✕</button>
+          <button class="aw-x" @pointerdown.stop @click="agentOpen = false"><span class="ico" v-html="icon('x')"></span></button>
         </div>
         <div class="chat"><div v-for="(b,i) in chat" :key="i" class="b" :class="{me: b.me}">{{ b.t }}</div></div>
         <div class="send"><input style="flex:1" v-model="chatIn" @keyup.enter="sendChat"
@@ -566,6 +573,31 @@ function api(method, path, body) {
   }).then(r => r.json());
 }
 const V = { token: "", loginName: "", role: "", refId: 0 };
+// 界面线稿图标（lucide 风格，stroke currentColor 1.5，16px）
+const PATHS = {
+  upload: '<path d="M12 15V4m0 0L8 8m4-4l4 4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>',
+  list: '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+  sliders: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+  chart: '<path d="M3 21h18M7 21V9m5 12V4m5 17v-8"/>',
+  calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/>',
+  shield: '<path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3z"/><path d="M9 12l2 2 4-4"/>',
+  file: '<path d="M6 2h9l5 5v15H6V2z"/><path d="M9 12h6M9 16h6M14 2v5h5"/>',
+  folder: '<path d="M4 5h5l2 3h9a1 1 0 0 1 1 1v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a1 1 0 0 1 1-1z"/>',
+  send: '<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+  logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
+  database: '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
+  cpu: '<rect x="6" y="6" width="12" height="12" rx="2"/><rect x="10" y="10" width="4" height="4"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/>',
+  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-5.5-3.5-9s1-6.5 3.5-9z"/>',
+  calculator: '<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h.01M12 19h.01M16 19h.01"/>',
+  flask: '<path d="M10 2v6L4 19a2 2 0 0 0 1.8 3h12.4a2 2 0 0 0 1.8-3L14 8V2M8 2h8"/>',
+  ruler: '<path d="M3 15L15 3l6 6-12 12H3v-6zM8 10l2 2M11 7l2 2"/>',
+  x: '<path d="M18 6L6 18M6 6l12 12"/>',
+};
+function svgIcon(name) {
+  const path = PATHS[name] || PATHS.list;
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' + path + '</svg>';
+}
 // 侧边栏导航图标（stroke 线稿，currentColor 跟随文字色）
 const NAV_ICONS = {
   import: '<svg viewBox="0 0 24 24"><path d="M12 15V4m0 0L8 8m4-4l4 4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -831,14 +863,15 @@ Vue.createApp({
       const r = this.cellFor(d, p);
       return r ? this.courseColor(r.course) : "";
     },
+    icon(name) { return svgIcon(name); },
     courseIcon(name) {
-      for (const [pat, ico] of [["数据|挖掘", "🗄"], ["机器|深度|智能|学习", "🧠"],
-          ["Web|网络|云", "🌐"], ["算法|编译", "🧮"], ["测试", "🧪"],
-          ["需求|设计|工程|管理|面向", "📐"], ["信息|安全", "🛡"],
-          ["操作|组成|结构|系统|项目", "⚙"]]) {
-        if (new RegExp(pat).test(name)) return ico;
+      for (const [pat, key] of [["数据|挖掘", "database"], ["机器|深度|智能|学习", "cpu"],
+          ["Web|网络|云", "globe"], ["算法|编译", "calculator"], ["测试", "flask"],
+          ["需求|设计|工程|管理|面向", "ruler"], ["信息|安全", "shield"],
+          ["操作|组成|结构|系统|项目", "cpu"]]) {
+        if (new RegExp(pat).test(name)) return svgIcon(key);
       }
-      return "📘";
+      return svgIcon("list");
     },
     exportUrl(fmt) {
       if (this.role === "teacher") return "/api/query/export?view=teacher&fmt=" + fmt;
@@ -863,8 +896,8 @@ Vue.createApp({
       this.chat.push({me: false, t: d.data.answer});
       if (d.data.pendings && d.data.pendings.length) {
         const tip = this.role === "admin"
-          ? "★ 已生成待确认项，确认后才会生效（点击待确认项列表中的「确认生效」）。"
-          : "★ 已提交教务管理员，管理员确认后生效，可在「通知」中留意结果。";
+          ? "已生成待确认项，确认后才会生效（点击待确认项列表中的「确认生效」）。"
+          : "已提交教务管理员，管理员确认后生效，可在「通知」中留意结果。";
         this.chat.push({me: false, t: tip});
         if (this.role === "admin") await this.refreshConstraintLists();
       }
